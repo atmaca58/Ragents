@@ -1,0 +1,19 @@
+schema_version: 2
+connections:
+  subscription:
+    provider: chatgpt
+    # Hesabınızın plan kullanımında desteklediği bir model kimliği seçin.
+    model: gpt-5.4
+    oauth_account: default
+agent:
+  id: ornek-ajan
+  name: Örnek Ajan
+  instructions: Türkçe yanıt ver. Gereksiz uzatma. Bilmediğini belirt.
+  connection: subscription
+  tools: [text_stats]
+  budget:
+    request_limit: 4
+    tool_calls_limit: 2
+    # ChatGPT'de bu sınır tüketim bildirimi geldikten sonra kontrol edilir.
+    output_tokens_limit: 1024
+    timeout_seconds: 60

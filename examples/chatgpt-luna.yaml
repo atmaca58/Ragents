@@ -1,0 +1,17 @@
+schema_version: 2
+connections:
+  subscription:
+    provider: chatgpt
+    model: gpt-6-luna
+    oauth_account: default
+agent:
+  id: luna
+  name: Luna
+  instructions: Türkçe, kısa yanıt ver. İstenen çıktının dışında açıklama ekleme.
+  connection: subscription
+  tools: []
+  budget:
+    request_limit: 1
+    tool_calls_limit: 0
+    output_tokens_limit: 256
+    timeout_seconds: 45

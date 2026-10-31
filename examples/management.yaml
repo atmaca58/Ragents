@@ -1,0 +1,21 @@
+schema_version: 2
+connections:
+  luna:
+    provider: chatgpt
+    model: gpt-6-luna
+    oauth_account: default
+  local:
+    provider: ollama
+    model: qwen3:8b
+    base_url: http://localhost:11434/v1
+agent:
+  id: assistant
+  name: Örnek Asistan
+  instructions: Türkçe, kısa ve açık yanıt ver. Bilmediğini belirt.
+  connection: luna
+  tools: []
+  budget:
+    request_limit: 1
+    tool_calls_limit: 0
+    output_tokens_limit: 256
+    timeout_seconds: 45

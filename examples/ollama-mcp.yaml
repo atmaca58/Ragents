@@ -1,0 +1,30 @@
+schema_version: 2
+connections:
+  local:
+    provider: ollama
+    model: qwen3:8b
+mcp_servers:
+  local-tools:
+    transport: stdio
+    command: .venv/Scripts/python.exe
+    args: [examples/tool-server.py]
+    timeout_seconds: 10
+agent:
+  id: ornek-mcp
+  name: Örnek MCP Ajanı
+  instructions: Türkçe kısa yanıt ver. Metin sayımı için izinli MCP aracını kullan.
+  connection: local
+  tools: []
+  mcp_tools:
+    - server: local-tools
+      name: text_stats
+      keywords: [say, sayım, kelime, karakter]
+  tool_selection:
+    max_tools: 2
+    max_schema_chars: 4000
+    max_description_chars: 300
+  budget:
+    request_limit: 3
+    tool_calls_limit: 2
+    output_tokens_limit: 256
+    timeout_seconds: 60

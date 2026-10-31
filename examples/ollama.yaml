@@ -1,0 +1,17 @@
+schema_version: 2
+connections:
+  local:
+    provider: ollama
+    model: qwen3:8b
+    base_url: http://localhost:11434/v1
+agent:
+  id: ornek-ajan
+  name: Örnek Ajan
+  instructions: Türkçe yanıt ver. Bilmediğini belirt. Gereksiz uzatma.
+  connection: local
+  tools: []
+  budget:
+    request_limit: 4
+    tool_calls_limit: 2
+    output_tokens_limit: 1024
+    timeout_seconds: 60

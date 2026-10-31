@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "r-agents": {
+      "command": "C:\\Projeler\\Ajan\\Ragents\\.venv\\Scripts\\ragents.exe",
+      "args": [
+        "mcp", "serve",
+        "--db", "C:\\Projeler\\Ajan\\Ragents\\data\\ragents.db",
+        "--config", "C:\\Projeler\\Ajan\\Ragents\\examples\\management.yaml",
+        "--allow-execute"
+      ]
+    }
+  }
+}

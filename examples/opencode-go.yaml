@@ -1,0 +1,13 @@
+schema_version: 2
+connections:
+  go:
+    provider: opencode_go
+    model: kimi-k3
+    api: chat_completions
+    api_key_env: OPENCODE_GO_API_KEY
+agent:
+  id: ornek-ajan
+  name: Örnek Ajan
+  instructions: Türkçe yanıt ver. Gereksiz uzatma. Bilmediğini belirt.
+  connection: go
+  tools: [text_stats]

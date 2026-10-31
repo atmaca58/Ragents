@@ -1,0 +1,18 @@
+schema_version: 2
+connections:
+  zen:
+    provider: opencode_zen
+    model: kimi-k3
+    api: chat_completions
+    api_key_env: OPENCODE_ZEN_API_KEY
+  zen-responses:
+    provider: opencode_zen
+    model: gpt-5.4
+    api: responses
+    api_key_env: OPENCODE_ZEN_API_KEY
+agent:
+  id: ornek-ajan
+  name: Örnek Ajan
+  instructions: Türkçe yanıt ver. Gereksiz uzatma. Bilmediğini belirt.
+  connection: zen
+  tools: [text_stats]
