@@ -65,3 +65,10 @@ def test_terminal_approval_applies_only_the_seen_hash(tmp_path, monkeypatch):
     monkeypatch.setattr("builtins.input", lambda: request.operation_hash[:12])
     assert main(["approvals", "--root", str(tmp_path), "approve", request.id]) == 0
     assert service.get(request.id).status == "applied"
+
+def test_numbered_choice_retries_invalid_input(monkeypatch):
+    from ragents.terminal_setup import choose
+    monkeypatch.setattr("ragents.terminal_setup.require_terminal", lambda: None)
+    answers = iter(["wrong", "9", "2"])
+    monkeypatch.setattr("builtins.input", lambda: next(answers))
+    assert choose("Provider", [("a", "A"), ("b", "B")]) == "b"

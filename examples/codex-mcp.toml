@@ -1,10 +1,5 @@
 [mcp_servers.r_agents]
-command = 'C:\Projeler\Ajan\Ragents\.venv\Scripts\ragents.exe'
-args = [
-  'mcp', 'serve',
-  '--db', 'C:\Projeler\Ajan\Ragents\data\ragents.db',
-  '--config', 'C:\Projeler\Ajan\Ragents\examples\management.yaml',
-  '--allow-execute',
-]
+command = "ragents"
+args = ["mcp", "serve"]
 startup_timeout_sec = 20
 tool_timeout_sec = 30

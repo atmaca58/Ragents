@@ -32,6 +32,38 @@ def ask(label, default=""):
         raise TaskStateError("Terminal girdisi sona erdi; işlem uygulanmadı.") from None
 
 
+def choose(label, options):
+    print(label, file=sys.stderr)
+    for index, (value, title) in enumerate(options, 1):
+        print(f"  {index}. {title}", file=sys.stderr)
+    while True:
+        selected = ask("Seçim numarası", "1")
+        if selected.isdecimal() and 1 <= int(selected) <= len(options):
+            return options[int(selected) - 1][0]
+        print("Listeden geçerli bir numara seçin.", file=sys.stderr)
+
+
+async def select_model(connection, root):
+    from openai import AsyncOpenAI
+    from ragents.providers import resolve_connection
+    try:
+        if connection.provider == "chatgpt":
+            from pydantic_ai.providers.openai_chatgpt import OpenAIChatGPTProvider
+            provider = OpenAIChatGPTProvider(credential_source=ChatGPTStore(root=root))
+            client = provider.client
+        else:
+            endpoint, key = resolve_connection(connection)
+            client = AsyncOpenAI(base_url=endpoint, api_key=key, timeout=20, max_retries=0)
+        async with client:
+            page = await client.models.list()
+            models = sorted({item.id for item in page.data})
+        if not models:
+            raise ValueError("empty")
+    except Exception:
+        raise TaskStateError("Sağlayıcıdan model listesi alınamadı. Bağlantı ve hesap erişimini kontrol edip kurulumu yeniden başlatın. Model tahmin edilmedi; profil oluşturulmadı.") from None
+    return choose("Hesabın sunduğu modeller (listeleme üretim isteği göndermez):", [(name, name) for name in models])
+
+
 def confirm_seen(value):
     require_terminal()
     print(json.dumps(value, ensure_ascii=False, indent=2), file=sys.stderr)
@@ -97,10 +129,9 @@ async def initialize(args):
     root = profile_root(args.root)
     if not args.non_interactive:
         print("R Agents · terminal kurulumu\nModel kaynakları: " + ", ".join(get_args(ProviderName)), file=sys.stderr)
-        args.provider = args.provider or ask("Model kaynağı", "chatgpt")
-        args.model = args.model or ask("Hesabınızın desteklediği model kimliği")
-        args.search = args.search or ask("Arama: disabled / tavily / brave / searxng", "disabled")
-    if not args.provider or not args.model:
+        args.provider = args.provider or choose("Model sağlayıcısı", [(name, name) for name in get_args(ProviderName)])
+        args.search = args.search or choose("Web araması", [("disabled", "Şimdilik bağlama"), ("tavily", "Tavily — hesap/anahtar"), ("brave", "Brave — hesap/anahtar"), ("searxng", "SearXNG — instance adresi")])
+    if not args.provider or (args.non_interactive and not args.model):
         raise TaskStateError("Model kaynağı ve model kimliği gereklidir.")
     catalog = ConnectionCatalog(root)
     if "primary" in catalog.read():
@@ -109,6 +140,14 @@ async def initialize(args):
     secret_ref = None
     if not args.non_interactive and args.provider in DEFAULT_KEY_ENVS and not args.api_key_env:
         secret_ref, env_name = store_key("model-primary"), None
+    if args.provider == "chatgpt":
+        login = args.login if args.login is not None else not args.non_interactive and ask("Resmi ChatGPT girişi açılsın mı? e/h", "e") == "e"
+        if login:
+            await sign_in(ChatGPTStore(root=root))
+    if not args.model:
+        candidate = ConnectionSpec(provider=args.provider, model="discovery", base_url=args.base_url,
+                                   api_key_env=env_name, secret_ref=secret_ref)
+        args.model = await select_model(candidate, root)
     connection = ConnectionSpec(provider=args.provider, model=args.model, base_url=args.base_url,
                                 api_key_env=env_name, secret_ref=secret_ref)
     search = SearchConnection(provider=args.search or "disabled",
@@ -118,10 +157,6 @@ async def initialize(args):
     catalog.put("primary", connection)
     TaskStore(database_path(root))
     save_search_connection(root, search)
-    if args.provider == "chatgpt":
-        login = args.login if args.login is not None else not args.non_interactive and ask("Resmi ChatGPT girişi açılsın mı? e/h", "e") == "e"
-        if login:
-            await sign_in(ChatGPTStore(root=root))
     background = args.background if args.background is not None else not args.non_interactive and ask("Oturum açılışında arka planı başlat? e/h", "e") == "e"
     if background:
         from ragents.windows_service import install_service, scheduler_command
@@ -129,6 +164,12 @@ async def initialize(args):
         await asyncio.to_thread(install_service, root)
         (root / "data/supervisor.stop").unlink(missing_ok=True)
         await asyncio.to_thread(scheduler_command, root, "start")
+    if not args.non_interactive:
+        print("\n✓ R Agents profil kurulumu tamamlandı.\n"
+              f"Sağlayıcı: {args.provider} | Model: {args.model}\n"
+              "Canlı model erişimi henüz doğrulanmadı.\n"
+              "Sonraki adım: ragents connect codex (veya opencode / claude)\n"
+              "Bağlantı kontrolü: ragents connections test primary", file=sys.stderr)
     return {"initialized": True, "profile": str(root), "model_connection": "primary", "background": bool(background),
             "next": "ragents connect codex | ragents connect opencode | ragents connect claude",
             "approval": "ragents approvals list → ragents approvals show KIMLIK → ragents approvals approve KIMLIK"}
