@@ -23,6 +23,22 @@ kaldırılacak; bilgisayarda varsayılan ürün kurulumu bulunmadı.
 
 Komut ve geliştirme sürümünün sınırları [terminal rehberindedir](terminal-quickstart.md).
 
+Yayın sonucu: depo herkese açık yapıldı; `v0.2.0-dev.20261102.2` geliştirme
+ön sürümünde beş kurulum varlığı yayımlandı. Windows PowerShell 5.1'in ham
+`irm | iex` metnindeki BOM sorunu regresyonla düzeltilerek yeni etikette
+yayımlandı; eski `.1` yayını taslağa alındı, etiket geçmişi değiştirilmedi.
+Yeni betik GitHub'dan kimliksiz indirilip, tüm release varlıkları yine
+kimliksiz alınarak geçici kökte kurulum/güncelleme/sağlık kontrolünü tamamladı.
+Sonrasında geçici uygulama, profil ve istemci kaydı kaldırıldı. Varsayılan
+uygulama dizini ve HKCU ürün kurulum kaydı yok; kullanıcı PATH'i değişmedi.
+
+GitHub CI ilk koşusunda Python 3.12/3.13'ün `list` metodu sonrası annotation
+çözümü ve Windows Git testinin `mingw64` varsayımı bulundu. Kaynakta deferred
+annotation ve testte `ucrt64` desteği eklendi. İlgili depolama/Git/kurucu seti
+14 testte, sabit yeni MinGit ile Git/takvim seti 5 testte geçti. Yeni CI koşusu
+ayrı izlenir; önceki başarısız koşular yeşil diye sunulmaz. Yayımlanan kurulum
+zaten kendi sabit Python 3.14 çalışma zamanını kullanır ve testten geçti.
+
 Bu kayıt, onaylanan [ürün teslim sözleşmesinin](product-delivery.md) uygulanan
 bölümünü ve henüz kapanmayan teslim kapılarını ayırır. Ürün henüz yayıma hazır
 değildir. Kişisel ajanlar taşınmadı ve V1 değiştirilmedi.

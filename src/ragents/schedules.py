@@ -1,4 +1,6 @@
 """Kalıcı, tek slot telafili görev takvimi. Zamanı gelmeyen iş model çağırmaz."""
+from __future__ import annotations
+
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 import uuid

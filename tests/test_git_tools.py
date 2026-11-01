@@ -38,7 +38,9 @@ def test_git_status_runs_in_native_sandbox(tmp_path):
     executable = git_executable()
     if sys.platform == "win32":
         # Kurucudaki kullanıcıya ait MinGit yerleşimini gerçek Git binary'siyle temsil et.
-        source = executable.parent.parent / "mingw64/bin"
+        source = next((executable.parent.parent / layout for layout in ("ucrt64/bin", "mingw64/bin")
+                       if (executable.parent.parent / layout / "git.exe").is_file()), None)
+        assert source is not None, "Windows Git çalışma zamanı dizini bulunamadı."
         target = tmp_path / "runtime/git/bin"
         target.mkdir(parents=True)
         for path in [source / "git.exe", source / "zlib1.dll", *source.glob("lib*.dll")]:
