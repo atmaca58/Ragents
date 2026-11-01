@@ -80,6 +80,7 @@ def configure_client(client, root, *, config_path=None, read_only=False, replace
         except (ValueError, TypeError, AttributeError):
             raise TaskStateError("İstemci ayarı okunamadı; dosyaya değişiklik yapılmadı.") from None
         if existing == entry:
+            remember_client(root, client, path, entry)
             return {"client": client, "config": str(path), "changed": False, "registered": True}
         if existing is not None and not replace:
             raise TaskStateError("r_agents kaydı farklı; önizlemeyi inceleyip --replace ile yeniden deneyin.")
@@ -92,6 +93,7 @@ def configure_client(client, root, *, config_path=None, read_only=False, replace
             backup = path.with_name(path.name + ".ragents-backup-" + uuid.uuid4().hex)
             shutil.copy2(path, backup)
         atomic_write(path, content.encode("utf-8"))
+        remember_client(root, client, path, entry)
         return {"client": client, "config": str(path), "backup": str(backup) if backup else None,
                 "changed": True, "registered": True, "connection_verified": False,
                 "next": "İstemciyi yeniden açın; istemcinin zorunlu MCP güven/bağlantı onayını tamamlayın."}
@@ -151,3 +153,13 @@ async def dispatch_connect(args):
     if args.test:
         result["server_test"] = await test_stdio_connection(root)
     return result
+
+
+def remember_client(root, client, path, entry):
+    journal = profile_root(root) / "connections/client-registrations.json"
+    journal.parent.mkdir(parents=True, exist_ok=True)
+    with FileLock(str(journal) + ".lock"):
+        records = json.loads(journal.read_text(encoding="utf-8")) if journal.exists() else []
+        records = [item for item in records if item["path"] != str(path)]
+        records.append({"client": client, "path": str(path), "entry": entry})
+        atomic_write(journal, json.dumps(records, ensure_ascii=False).encode("utf-8"))

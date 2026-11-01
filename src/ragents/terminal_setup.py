@@ -74,6 +74,9 @@ def confirm_seen(value):
 
 
 def add_terminal_parsers(commands):
+    uninstall = commands.add_parser("uninstall", help="MCP kayıtlarını, hizmeti ve uygulamayı kaldır; kullanıcı profilini koru")
+    uninstall.add_argument("--root", type=Path)
+    uninstall.add_argument("--yes", action="store_true", help="Yerel kaldırma onayını önceden ver")
     init = commands.add_parser("init", help="Terminalden modeli/aramayı bağla ve kullanıcı profilini hazırla")
     init.add_argument("--root", type=Path)
     init.add_argument("--provider", choices=get_args(ProviderName))

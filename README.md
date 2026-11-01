@@ -134,6 +134,20 @@ Uygulama ile kullanıcı verileri ayrı tutulur. Varsayılan profil:
 `%LOCALAPPDATA%\RAgents\profiles\default`.
 Kimlik bilgileri taşınabilir profil paketine dahil edilmez.
 
+## Kaldırma
+
+Yeni kaynak sürümünde:
+
+```powershell
+ragents uninstall
+```
+
+Yerel onaydan sonra seçili profilin arka plan görevi, bu kuruluma ait yerel
+MCP kayıtları, PATH girdisi ve uygulama dosyaları kaldırılır. Ajanların,
+görev geçmişin ve kimlik bilgilerin kullanıcı profilinde korunur.
+ChatGPT web hesabındaki bağlantıyı ve kendi tünelini ayrıca kaldırmalısın.
+Bu komut henüz yukarıdaki sabit kurulum paketinde bulunmaz.
+
 ## Yardım ve katkı
 
 [Kurulum ve kullanım](docs/terminal-quickstart.md) ·

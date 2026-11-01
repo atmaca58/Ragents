@@ -135,6 +135,9 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 async def dispatch(args: argparse.Namespace) -> dict:
+    if args.command == "uninstall":
+        from ragents.uninstall import uninstall
+        return await asyncio.to_thread(uninstall, args)
     if args.command == "connect":
         return await dispatch_connect(args)
     if args.command == "installation":
