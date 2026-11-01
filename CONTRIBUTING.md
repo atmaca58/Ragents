@@ -37,3 +37,5 @@ Kullanıcı profillerini, kimlik bilgilerini ve yerel veritabanlarını commit e
 
 Kaynak deposu testleri içerir; kullanıcıya kurulan uygulama paketi testleri
 ve geliştirici örneklerini içermez. Mevcut sürüm geliştirme ön sürümüdür.
+
+[Sürümleme politikası](docs/versioning.md) · [Değişiklikler](CHANGELOG.md)

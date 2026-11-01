@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory=$true)][string]$StageDirectory,
-    [string]$ProductVersion = '0.2.0.dev1',
+    [string]$ProductVersion = '0.2.0.dev3',
     [string]$ReleaseDirectory = 'dist'
 )
 $ErrorActionPreference = 'Stop'

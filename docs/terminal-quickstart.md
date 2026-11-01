@@ -10,7 +10,7 @@ Bu geliştirme sürümünün gerçek hesap/istemci ve kurulum kabulü henüz aç
 Herkese açık GitHub geliştirme sürümünü Windows 11 x64 PowerShell'de kurmak:
 
 ```powershell
-irm https://raw.githubusercontent.com/atmaca58/Ragents/v0.2.0-dev.20261102.2/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/atmaca58/Ragents/v0.2.0-dev.3/scripts/install.ps1 | iex
 ```
 
 Komut yönetici yetkisi, sistem Python'u, Git veya GitHub hesabı gerektirmez.
@@ -42,10 +42,10 @@ terminal açarak:
 ragents init
 ```
 
-Terminal model kaynağı/model kimliği, arama seçimi ve arka plan çalışmasını
-sorar. API anahtarı gerektiğinde görünmeyen girişle işletim sistemi kasasına
+Terminal model kaynağını ve aramayı numaralı menüden seçtirir. Girişten sonra
+sağlayıcının model listesi alınır ve numarayla seçim yapılır. Arka plan çalışması ayrıca sorulur. API anahtarı gerektiğinde görünmeyen girişle işletim sistemi kasasına
 kaydedilir. ChatGPT seçildiğinde sağlayıcının resmi giriş/onay sayfası açılır.
-Model kimliğini hesabınızın desteklediği değere göre seçin. Başka uygulamanın
+Model listesi alınamazsa kurulum açık hata vererek durur; tahmini model kaydedilmez. Başka uygulamanın
 oturumu alınmaz. Model erişimi yetersizse ücretli API'ye geçilmez.
 
 PATH henüz yenilenmediyse aynı komutun varsayılan tam yolu:

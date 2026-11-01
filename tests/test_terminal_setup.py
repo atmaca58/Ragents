@@ -72,3 +72,27 @@ def test_numbered_choice_retries_invalid_input(monkeypatch):
     answers = iter(["wrong", "9", "2"])
     monkeypatch.setattr("builtins.input", lambda: next(answers))
     assert choose("Provider", [("a", "A"), ("b", "B")]) == "b"
+
+
+def test_model_selection_uses_provider_catalog_without_generation(tmp_path, monkeypatch):
+    import asyncio
+    from types import SimpleNamespace
+    from ragents.config import ConnectionSpec
+    from ragents.terminal_setup import select_model
+    calls = []
+    class Client:
+        def __init__(self, **kwargs):
+            self.models = self
+        async def __aenter__(self):
+            return self
+        async def __aexit__(self, *args):
+            pass
+        async def list(self):
+            calls.append('models.list')
+            return SimpleNamespace(data=[SimpleNamespace(id='local-model-b'), SimpleNamespace(id='local-model-a')])
+    monkeypatch.setattr('openai.AsyncOpenAI', Client)
+    monkeypatch.setattr('ragents.terminal_setup.require_terminal', lambda: None)
+    monkeypatch.setattr('builtins.input', lambda: '2')
+    connection = ConnectionSpec(provider='ollama', model='discovery')
+    assert asyncio.run(select_model(connection, tmp_path)) == 'local-model-b'
+    assert calls == ['models.list']

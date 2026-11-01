@@ -227,3 +227,35 @@ gölgeleme olmadığını ve üretim fonksiyonu bozulunca testin düştüğünü
 eder. **15 hedefte kontrol geçti.** Her mutasyonun ardından dosya byte
 düzeyinde geri yüklenir. Gerçek model, kullanıcı kasası, temiz Windows kurucu
 ve uzak istemci/tünel kabulü yapılmadı.
+
+
+## 0.2.0-dev.3 — terminal deneyimi ve sürümleme
+
+- Sağlayıcı/arama için numaralı menüler; sağlayıcıdan model listesi ve açık listeleme hatası.
+- Kurulum sonu özeti; kişisel geliştirme yolları çıkarılmış MCP örnekleri.
+- Ürün README'si ve ayrı CONTRIBUTING rehberi.
+- `ragents uninstall`: seçili profilin supervisor kaydı, bu kuruluma ait
+  yerel MCP kayıtları, PATH ve uygulama dosyaları. Profil ve kimlik bilgileri
+  korunur. ChatGPT hesap bağlantısı ve kullanıcı tüneli ayrıca kaldırılır.
+- Özel istemci ayar yolları yeni bağlantılarda envantere yazılır. Eski
+  özel yollar otomatik keşfedilemez; değiştirilmiş/yabancı MCP kaydı korunur
+  ve kaldırma açık hata ile durur.
+- [Sürümleme politikası](versioning.md): `0.2.0-dev.N`, kararlı sürümde
+  semantik sürümleme. Paket ve Git etiketleri değişmez.
+- Temiz staging, bağımsız Python/Git/Chromium indirmeleriyle geçici kurulum
+  geçti. Kurulu sürüm `0.2.0.dev3`; gerçek yerel stdio MCP el sıkışması
+  25 araç keşfetti, model isteği 0. Yeni kaldırma komutu uygulamayı ve test
+  MCP kaydını sildi, profilin korunduğu doğrulandı. Sonra yalnız test verileri temizlendi.
+- Wheel içinde yalnız uygulama namespace'i ve paket metadatası bulundu.
+- Model listesi testi sahte sağlayıcı kataloğuyla gerçek seçim fonksiyonunu
+  çalıştırır; gerçek hesap/plan erişimi kabulü değildir.
+- Önceki CI'da Windows Git test fixture'ı tüm DLL'leri taşımıyordu;
+  `*.dll` kullanacak şekilde düzeltildi. Önceki macOS/Linux sandbox hataları
+  açık; deneysel platformlar tam destek olarak sunulmaz.
+- İlk tam test koşusunda Windows süreç sınırı testi Python codec erişim
+  hatası verdi; tek başına tekrar geçti. Eşzamanlı başka native test olmadan
+  yapılan son seri koşu: **306 geçti, 3 atlandı**, 268,85 saniye.
+
+Bu paket geliştirme ön sürümüdür; ürün hazır kapısı, gerçek hesap/istemci/
+arama kabulü ve 20 × 3 senaryo tamamlanmış değildir. Canlı ücretli model
+çağrısı yapılmadı. Kendi bilgisayarındaki kabul, temiz VM kabulü diye sunulmaz.

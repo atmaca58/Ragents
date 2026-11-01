@@ -6,12 +6,14 @@ from pathlib import Path
 import shutil
 import zipfile
 
+from ragents import __version__
 from ragents.distribution import file_hash
 
 
 def prepare(root, stage, output):
     output.mkdir(parents=True, exist_ok=False)
-    version = "0.2.0.dev1"
+    version = __version__
+    release_tag = "v" + version.replace(".dev", "-dev.")
     # Paketlenen uygulamanın canlı kaynakla aynı olduğunu doğrula.
     packaged = stage / "versions" / version / "python/Lib/site-packages/ragents"
     for source in (root / "src/ragents").rglob("*.py"):
@@ -33,8 +35,8 @@ def prepare(root, stage, output):
         return {"name": name, "sha256": file_hash(output / name)}
 
     manifest = {
-        "schema_version": 1, "release_tag": "v0.2.0-dev.20261102.2",
-        "version": "0.2.0.dev1-20261102-2", "accepted": False, "signed": False,
+        "schema_version": 1, "release_tag": release_tag,
+        "version": version, "accepted": False, "signed": False,
         "python": runtimes["python"], "git": runtimes["git"],
         "pip": {
             "url": "https://files.pythonhosted.org/packages/f3/6e/1736e5b4ae2b778ef2f81c47d797de9f891d4d8acb047a24ca37a60294dd/pip-26.2.1-py3-none-any.whl",
@@ -47,6 +49,7 @@ def prepare(root, stage, output):
     target.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     bootstrap = root / "scripts/install.ps1"
     text = bootstrap.read_text(encoding="utf-8-sig")
+    text = re.sub(r"(?m)^\$ReleaseTag = '[^']+'$", f"$ReleaseTag = '{release_tag}'", text)
     updated, count = re.subn(r"(?m)^\$ManifestHash = '[a-f0-9]{64}'$",
                             f"$ManifestHash = '{file_hash(target)}'", text)
     if count != 1:

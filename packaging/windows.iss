@@ -2,7 +2,7 @@
   #error StageDir tanımlanmalıdır
 #endif
 #ifndef ProductVersion
-  #define ProductVersion "0.2.0.dev1"
+  #define ProductVersion "0.2.0.dev3"
 #endif
 #ifndef ReleaseDir
   #define ReleaseDir "."

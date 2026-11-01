@@ -43,7 +43,7 @@ def test_git_status_runs_in_native_sandbox(tmp_path):
         assert source is not None, "Windows Git çalışma zamanı dizini bulunamadı."
         target = tmp_path / "runtime/git/bin"
         target.mkdir(parents=True)
-        for path in [source / "git.exe", source / "zlib1.dll", *source.glob("lib*.dll")]:
+        for path in [source / "git.exe", *source.glob("*.dll")]:
             shutil.copy2(path, target / path.name)
         executable = target / "git.exe"
     result = asyncio.run(GitTools(WorkspaceGrant(root=tmp_path), executable=executable).status())

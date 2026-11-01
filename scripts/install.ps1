@@ -8,9 +8,9 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$ReleaseTag = 'v0.2.0-dev.20261102.2'
+$ReleaseTag = 'v0.2.0-dev.3'
 $ReleaseBase = "https://github.com/atmaca58/Ragents/releases/download/$ReleaseTag"
-$ManifestHash = 'c31297c5924576f8025b131e574572c565f7f427736c3abca7616568c6126c7f'
+$ManifestHash = '4ec01256d8317dc16ad1cd15401637a3d351d06ff7e5cbea2d2b374b81690fa2'
 
 function Assert-PlainPath([string]$Path) {
     $item = [System.IO.DirectoryInfo]::new([System.IO.Path]::GetFullPath($Path))

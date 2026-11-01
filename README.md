@@ -33,7 +33,7 @@ ajanın ne yapacağını bağlı yapay zekâ istemcisine anlatırsın.
 Windows 11 x64 üzerinde PowerShell'i aç ve çalıştır:
 
 ```powershell
-irm https://raw.githubusercontent.com/atmaca58/Ragents/v0.2.0-dev.20261102.2/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/atmaca58/Ragents/v0.2.0-dev.3/scripts/install.ps1 | iex
 ```
 
 GitHub hesabı, yönetici yetkisi veya önceden kurulmuş Python/Git gerekmez.
@@ -46,9 +46,9 @@ Kurulumun sonunda terminal sihirbazı açılır:
 3. **Arka plan çalışmasını belirle.** Ajanların oturum açılışında başlatılmasını seç.
 4. **İstemcini bağla.** Aşağıdaki komutlardan kullandığın istemciyi çalıştır.
 
-> Yayımlanan kurucu sabit bir sürümü yükler. Kaynak kodundaki yeni numaralı
-> seçim menüleri, sağlayıcıdan model listeleme ve tamamlanma özeti henüz bu
-> kurulum paketinde yoktur. Bu pakette model kimliği elle istenir.
+Sağlayıcı ve arama numaralı listelerden seçilir. Model listesi sağlayıcıdan
+alınır; model kimliğini ezberlemen gerekmez. Liste alınamazsa kurulum açık
+hata verir. Kurulum sonunda seçilen sağlayıcı/model ve sonraki adım gösterilir.
 
 ## İstemcini bağla
 
@@ -136,8 +136,6 @@ Kimlik bilgileri taşınabilir profil paketine dahil edilmez.
 
 ## Kaldırma
 
-Yeni kaynak sürümünde:
-
 ```powershell
 ragents uninstall
 ```
@@ -146,7 +144,7 @@ Yerel onaydan sonra seçili profilin arka plan görevi, bu kuruluma ait yerel
 MCP kayıtları, PATH girdisi ve uygulama dosyaları kaldırılır. Ajanların,
 görev geçmişin ve kimlik bilgilerin kullanıcı profilinde korunur.
 ChatGPT web hesabındaki bağlantıyı ve kendi tünelini ayrıca kaldırmalısın.
-Bu komut henüz yukarıdaki sabit kurulum paketinde bulunmaz.
+
 
 ## Yardım ve katkı
 

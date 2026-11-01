@@ -16,3 +16,4 @@ local-profile/
 .build-cache/
 .release-stage/
 .installer-tools/
+.implementation-tests/
