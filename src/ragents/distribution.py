@@ -10,7 +10,7 @@ from ragents.storage import TaskStateError
 
 
 SOURCE_DIRECTORIES = frozenset({"src", "tests", "docs", "scripts", "examples", "packaging", ".github"})
-SOURCE_FILES = frozenset({"README.md", "LICENSE", "NOTICE", "pyproject.toml", "requirements-dev.lock",
+SOURCE_FILES = frozenset({"README.md", "CONTRIBUTING.md", "LICENSE", "NOTICE", "pyproject.toml", "requirements-dev.lock",
                           "AGENTS.md", ".gitignore", ".gitattributes"})
 BLOCKED_PARTS = frozenset({"__pycache__", ".pytest_cache", ".venv", "data", "auth", "agents", "local-profile"})
 
