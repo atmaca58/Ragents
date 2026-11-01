@@ -1,6 +1,7 @@
 """Çalışma zamanlarını yeniden dağıtmadan çevrimiçi kurulum varlıklarını hazırlar."""
 import argparse
 import json
+import re
 from pathlib import Path
 import shutil
 import zipfile
@@ -32,8 +33,8 @@ def prepare(root, stage, output):
         return {"name": name, "sha256": file_hash(output / name)}
 
     manifest = {
-        "schema_version": 1, "release_tag": "v0.2.0-dev.20261102.1",
-        "version": "0.2.0.dev1-20261102-1", "accepted": False, "signed": False,
+        "schema_version": 1, "release_tag": "v0.2.0-dev.20261102.2",
+        "version": "0.2.0.dev1-20261102-2", "accepted": False, "signed": False,
         "python": runtimes["python"], "git": runtimes["git"],
         "pip": {
             "url": "https://files.pythonhosted.org/packages/f3/6e/1736e5b4ae2b778ef2f81c47d797de9f891d4d8acb047a24ca37a60294dd/pip-26.2.1-py3-none-any.whl",
@@ -45,11 +46,13 @@ def prepare(root, stage, output):
     target = output / "install-manifest.json"
     target.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     bootstrap = root / "scripts/install.ps1"
-    text = bootstrap.read_text(encoding="utf-8")
-    old = "MANIFEST_HASH_PLACEHOLDER"
-    if old not in text:
-        raise RuntimeError("Bootstrap manifest hash'i zaten sabitlenmiş; yeni sürüm için açıkça güncelleyin.")
-    bootstrap.write_text(text.replace(old, file_hash(target)), encoding="utf-8")
+    text = bootstrap.read_text(encoding="utf-8-sig")
+    updated, count = re.subn(r"(?m)^\$ManifestHash = '[a-f0-9]{64}'$",
+                            f"$ManifestHash = '{file_hash(target)}'", text)
+    if count != 1:
+        raise RuntimeError("Bootstrap içinde tam bir manifest hash alanı gereklidir.")
+    # irm | iex, PowerShell 5.1'de metnin başındaki BOM'u param bloğu olarak algılamaz.
+    bootstrap.write_text(updated, encoding="utf-8")
     (output / "SHA256SUMS").write_text("".join(
         f"{file_hash(path)}  {path.name}\n" for path in sorted(output.iterdir()) if path.is_file()), encoding="utf-8")
     print(json.dumps({"release": manifest["release_tag"], "manifest_sha256": file_hash(target)}))

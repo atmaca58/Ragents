@@ -3,7 +3,7 @@
 Windows 11 x64 için PowerShell'de tek komutla geliştirme sürümü kurulumu:
 
 ```powershell
-irm https://raw.githubusercontent.com/atmaca58/Ragents/v0.2.0-dev.20261102.1/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/atmaca58/Ragents/v0.2.0-dev.20261102.2/scripts/install.ps1 | iex
 ```
 
 Python/Git/Chromium ayrıca kurulu olmak zorunda değildir; kurucu sabit

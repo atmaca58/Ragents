@@ -22,6 +22,15 @@ def helpers():
     return f". '{script}' -FunctionsOnly; "
 
 
+def test_online_installer_parses_as_downloaded_text_in_powershell_51():
+    script = Path("scripts/install.ps1").resolve()
+    code = ("$ErrorActionPreference='Stop'; "
+            f"$text=[System.Text.Encoding]::UTF8.GetString([System.IO.File]::ReadAllBytes('{script}')); "
+            "& ([scriptblock]::Create($text)) -FunctionsOnly")
+    result = powershell(code)
+    assert result.returncode == 0, result.stderr
+
+
 def test_online_installer_rejects_bad_hash_before_promoting_download(tmp_path):
     target = tmp_path / "download.zip"
     code = helpers() + (

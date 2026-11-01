@@ -1,4 +1,4 @@
-﻿param(
+param(
     [string]$InstallRoot = (Join-Path $env:LOCALAPPDATA 'Programs\RAgents'),
     [string]$ProfileRoot = $(if ($env:RAGENTS_HOME) { $env:RAGENTS_HOME } else { Join-Path $env:LOCALAPPDATA 'RAgents\profiles\default' }),
     [switch]$SkipConfigure,
@@ -8,9 +8,9 @@
 )
 
 $ErrorActionPreference = 'Stop'
-$ReleaseTag = 'v0.2.0-dev.20261102.1'
+$ReleaseTag = 'v0.2.0-dev.20261102.2'
 $ReleaseBase = "https://github.com/atmaca58/Ragents/releases/download/$ReleaseTag"
-$ManifestHash = 'e2b2b938fffcec5864e0083cc1d32aaa88e1f5dd328fc982e7a6bbace6866785'
+$ManifestHash = 'c31297c5924576f8025b131e574572c565f7f427736c3abca7616568c6126c7f'
 
 function Assert-PlainPath([string]$Path) {
     $item = [System.IO.DirectoryInfo]::new([System.IO.Path]::GetFullPath($Path))

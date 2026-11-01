@@ -7,7 +7,7 @@ herkese açık yapmayı ve hesap gerektirmeyen tek komutla kurulumu açıkça is
 Önceki kabul-sonrası-yayın sırası bu geliştirme yayını için değişti; ürünün
 tam kabulü ve kişisel ajan geçişi yapılmış sayılmaz.
 
-`scripts/install.ps1`, sabit `v0.2.0-dev.20261102.1` manifesti ve SHA-256 ile
+`scripts/install.ps1`, sabit `v0.2.0-dev.20261102.2` manifesti ve SHA-256 ile
 uygulama/Python/Git/pip varlıklarını doğrular; bağımlılıklar PyPI'den, sabit
 Playwright tarayıcısı resmi CDN'den gelir. Sistemde Python/Git/ajan istemcisi
 gerekmez. Yalnız uygulama wheel'i, kendi launcher'larımız, bağımlılık kilidi,
