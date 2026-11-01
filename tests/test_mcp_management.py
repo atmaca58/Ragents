@@ -60,7 +60,7 @@ def test_management_client_cancels_active_worker_and_has_no_result(tmp_path):
     async def scenario():
         entered, cleaned, stop = asyncio.Event(), asyncio.Event(), asyncio.Event()
 
-        async def runner(config, prompt, connection):
+        async def runner(config, prompt, connection, workspace):
             entered.set()
             try:
                 await asyncio.Event().wait()

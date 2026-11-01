@@ -11,6 +11,22 @@ class Spec(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
 
+MAX_INSTRUCTION_CHARS = 16000
+BuiltinToolName = Literal[
+    "text_stats", "list_files", "search_text", "read_file",
+    "write_file", "apply_patch", "run_command",
+    "web_search", "read_page",
+    "git_status", "git_diff", "git_branch", "git_worktree", "git_commit",
+    "browser_run",
+]
+READ_TOOL_NAMES = frozenset({"list_files", "search_text", "read_file"})
+WRITE_TOOL_NAMES = frozenset({"write_file", "apply_patch"})
+COMMAND_TOOL_NAMES = frozenset({"run_command"})
+WEB_TOOL_NAMES = frozenset({"web_search", "read_page", "browser_run"})
+GIT_TOOL_NAMES = frozenset({"git_status", "git_diff", "git_branch", "git_worktree", "git_commit"})
+WORKSPACE_TOOL_NAMES = READ_TOOL_NAMES | WRITE_TOOL_NAMES | COMMAND_TOOL_NAMES | WEB_TOOL_NAMES | GIT_TOOL_NAMES
+
+
 class Budget(Spec):
     request_limit: int = Field(default=4, ge=1, le=100)
     tool_calls_limit: int = Field(default=2, ge=0, le=100)
@@ -22,6 +38,7 @@ class Budget(Spec):
 
 class ContextPolicy(Spec):
     max_request_chars: int = Field(default=24000, ge=256, le=200000)
+    max_instruction_chars: int = Field(default=MAX_INSTRUCTION_CHARS, ge=512, le=MAX_INSTRUCTION_CHARS)
     max_history_turns: int = Field(default=4, ge=0, le=50)
     max_tool_output_chars: int = Field(default=2000, ge=64, le=32000)
 
@@ -73,13 +90,21 @@ class ConnectionSpec(Spec):
     api_key_env: str | None = Field(default=None, pattern=r"^[A-Za-z_][A-Za-z0-9_]*$")
     api: WireAPI | None = None
     oauth_account: str | None = Field(default=None, pattern=r"^[a-z0-9][a-z0-9-]{0,63}$")
+    secret_ref: str | None = Field(default=None, pattern=r"^[a-z0-9][a-z0-9-]{0,63}$")
 
     @model_validator(mode="after")
     def validate_endpoint(self) -> "ConnectionSpec":
+        if self.api_key_env and self.secret_ref:
+            raise ValueError("API anahtarı için ortam veya kasa referansı seçin.")
+        if self.base_url is not None and any((
+            self.base_url.username, self.base_url.password,
+            self.base_url.query, self.base_url.fragment,
+        )):
+            raise ValueError("API adresi kimlik bilgisi, sorgu veya fragment içeremez.")
         if self.provider in FIXED_ENDPOINTS and self.base_url is not None:
             raise ValueError("OpenRouter/Go/Zen/ChatGPT için özel base_url desteklenmiyor.")
         if self.provider == "chatgpt":
-            if self.api_key_env is not None or self.api not in (None, "responses"):
+            if self.api_key_env is not None or self.secret_ref is not None or self.api not in (None, "responses"):
                 raise ValueError("ChatGPT yalnız OAuth ve Responses API ile kullanılabilir.")
         elif self.oauth_account is not None:
             raise ValueError("oauth_account yalnız ChatGPT için kullanılabilir.")
@@ -93,9 +118,9 @@ class ConnectionSpec(Spec):
 class AgentSpec(Spec):
     id: str = Field(pattern=r"^[a-z0-9][a-z0-9-]{0,63}$")
     name: str = Field(min_length=1, max_length=100)
-    instructions: str = Field(min_length=1, max_length=16000)
+    instructions: str = Field(min_length=1, max_length=MAX_INSTRUCTION_CHARS)
     connection: str = Field(min_length=1)
-    tools: tuple[Literal["text_stats"], ...] = ()
+    tools: tuple[BuiltinToolName, ...] = ()
     budget: Budget = Field(default_factory=Budget)
     context: ContextPolicy = Field(default_factory=ContextPolicy)
     mcp_tools: tuple[MCPGrant, ...] = ()

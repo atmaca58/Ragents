@@ -1,6 +1,8 @@
 # ChatGPT OAuth, OpenCode Go ve Zen
 
-Tarih: 1 Kasım 2026. Bu entegrasyonlar harici ajan CLI'sı başlatmaz.
+Tarih: 1 Kasım 2026. Bu entegrasyonlar harici ajan CLI'sı başlatmaz. Komut
+örnekleri Windows PowerShell/`.exe` biçimindedir; macOS/Linux karşılıkları
+[platform desteğindedir](platform-support.md).
 
 | Bağlantı | Kimlik | Native model yolu |
 | --- | --- | --- |
@@ -29,7 +31,7 @@ oturumları okunmaz veya kopyalanmaz. OpenAI API anahtarı bu bağlantıda kabul
 edilmez; hata veya kota dolması otomatik başka bir faturaya yönlendirilmez.
 
 ```powershell
-cd C:\Projeler\Ajan\Ragents
+cd C:\RAgents-Kaynak
 .\.venv\Scripts\ragents.exe auth login chatgpt
 .\.venv\Scripts\ragents.exe auth status chatgpt
 .\.venv\Scripts\ragents.exe check --config examples/chatgpt.yaml

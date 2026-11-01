@@ -1,5 +1,31 @@
 # R Agents
 
+Windows 11 x64 için PowerShell'de tek komutla geliştirme sürümü kurulumu:
+
+```powershell
+irm https://raw.githubusercontent.com/atmaca58/Ragents/v0.2.0-dev.20261102.1/scripts/install.ps1 | iex
+```
+
+Python/Git/Chromium ayrıca kurulu olmak zorunda değildir; kurucu sabit
+çalışma zamanlarını resmi kaynaklarından indirir ve hash'leri doğrular.
+Yönetici yetkisi gerekmez. Kurulum sonunda terminalden model/arama seçimi
+açılır. Bu bir geliştirme ön sürümüdür; gerçek hesap/istemci kabulü açık.
+[Kurulum ve MCP bağlantısı](docs/terminal-quickstart.md).
+
+Windows ürünleştirmesinin uygulanan davranışları, yeni profil/takvim/yedek
+komutları ve açık teslim kapıları [güncel uygulama kaydında](docs/windows-product-progress.md).
+İlk desteklenen ürün Windows 11 x64'tür; macOS/Linux native kabulüne kadar deneyseldir.
+
+Lisans: [Apache-2.0](LICENSE). Bu geliştirme sürümü henüz Windows kurucusu ve
+ürün kabul kapıları tamamlanmış bir release değildir.
+
+**Ana ürün akışı terminaldir:** Windows EXE kurucusundan sonra `ragents init`,
+ardından `ragents connect codex`, `ragents connect opencode` veya
+`ragents connect claude`. Ayrı ürün web paneli yoktur; MCP kurulum taslakları
+`ragents approvals` ile terminalden onaylanır. ChatGPT web için HTTPS tüneli ve
+OAuth gerekir. [Terminal kurulum ve bağlantı rehberi](docs/terminal-quickstart.md).
+Bu komutların çevrimdışı regresyonları var; gerçek istemci/hesap kabulü açık.
+
 Kendi LLM kaynağınızı bağlayabileceğiniz, Python tabanlı bağımsız ajan sistemi.
 Bu paket V2'nin **ilk çalışan native prototipidir** (`0.2.0.dev1`).
 Codex/OpenCode kurulumu gerektirmez. Python komut satırı bu çekirdeğin ince
@@ -22,9 +48,19 @@ ve görev başına kayıtlı model kaynağı seçimi hazır. Stdio ve yerel HTTP
 Codex/diğer istemci ayarları ve ChatGPT tünel bağlantısı
 [dış yönetim rehberinde](docs/external-management.md).
 
-**Birleşik kurulum hazır:** `scripts/setup.ps1` sağlayıcı/model seçimini,
+**Görev yönetimi hazır:** başlık, açıklama, öncelik, etkinlik, bağımlılık,
+tanım revizyonu, arşivleme ve Markdown dışa/içe aktarma eklendi. SQLite
+doğruluk kaynağıdır; kullanım [görev yönetiminde](docs/task-management.md).
+
+**Birleşik kurulum hazır:** `scripts/setup.py` sağlayıcı/model seçimini,
 örnek ajanı, bağlantı kontrolünü ve worker/MCP dosyalarını tek akışta oluşturur.
 [Kurulum ve özelleştirme rehberi](docs/setup-and-customization.md).
+
+V1 benzeri günlük kullanım ve ajan ekipleri için eksikler, bağımlılıklar ve
+tamamlanma ölçütleri [geliştirme görev listesinde](docs/readiness-backlog.md).
+
+Aşağıdaki hızlı komutlar Windows içindir; macOS/Linux'ta `.exe` yerine
+`.venv/bin/ragents` kullanın.
 
 ```powershell
 .\.venv\Scripts\ragents.exe auth login chatgpt
@@ -33,16 +69,39 @@ Codex/diğer istemci ayarları ve ChatGPT tünel bağlantısı
 
 ## Kurulum
 
-Python 3.12–3.14 hedeflenir. Bu başlangıç Windows / Python 3.14.7 üzerinde
-doğrulandı; diğer Python sürümleri ve işletim sistemleri henüz test edilmedi.
+Windows, macOS ve Linux üzerinde Python 3.12–3.14 hedeflenir. Gerçek yerel
+doğrulama Windows / Python 3.14.7 içindir; macOS/Linux native testleri henüz
+çalıştırılmadı. [Platform kurulumları ve test matrisi](docs/platform-support.md).
+
+macOS / Linux için:
+
+```sh
+python3 scripts/setup.py
+.venv/bin/python local-profile/start-worker.py
+```
 
 Proje dizininde PowerShell ile:
 
 ```powershell
-cd C:\Projeler\Ajan\Ragents
+cd C:\RAgents-Kaynak
 .\scripts\setup.ps1
 .\.venv\Scripts\ragents.exe demo
 ```
+
+Diğer bölümlerdeki PowerShell/`.exe` örnekleri Windows içindir. macOS/Linux
+karşılıkları `.venv/bin/ragents`, `.venv/bin/python` ve
+`local-profile/start-worker.py` biçimindedir; tam tablo
+[platform desteğindedir](docs/platform-support.md).
+
+Sandbox backend'ini kontrol edin ve izole bir komut çalıştırın:
+
+```powershell
+.\.venv\Scripts\ragents.exe sandbox status
+.\.venv\Scripts\ragents.exe sandbox run --workspace C:\Projeler\Ornek -- python -c "print('merhaba')"
+```
+
+Ayrıntılar, platform gereksinimleri ve güvenlik sınırları
+[sandbox rehberindedir](docs/sandbox.md).
 
 Script Python ortamını/bağımlılıkları kurar ve ajan kurulum sihirbazını açar.
 Model indirmez; gerçek model bağlantı testi açık seçim gerektirir ve token
@@ -63,8 +122,9 @@ python -m venv .venv
 ```
 
 `pyproject.toml` doğrudan bağımlılıkların kaynağıdır. `requirements-dev.lock`
-bu geliştirme ortamında çözülen doğrudan ve geçişli bağımlılıkların sabit
-sürümleridir; hash doğrulamalı veya tüm platformları kapsayan bir lock değildir.
+Windows geliştirme ortamında çözülen doğrudan ve geçişli bağımlılıkların sabit
+sürümleridir; macOS/Linux kurucusu `pyproject.toml` kullanır. Lock hash
+doğrulamalı veya tüm platformları kapsayan bir lock değildir.
 Build backend sürüm aralığı `pyproject.toml` içindedir.
 
 ## Yerel model ile çalışma
@@ -113,8 +173,16 @@ canlı doğrulaması ayrıca yapılacaktır.
 
 - Varsayılan örnek ajan araçsızdır. `tools: [text_stats]` ile yalnız metin
   sayma aracı açılır. Araç girdisi en fazla 8.000 karakterdir.
-- Yerleşik dosya, shell, tarayıcı veya sandbox yetkisi verilmez. MCP üzerinden
-  verilen yetkiler açık araç izin listesiyle belirlenir.
+- Modele araçlar kendiliğinden verilmez. `write_file`, `apply_patch` ve
+  `run_command` yalnız `agent.yaml` `tools` listesinde açıkça seçilirse ve görev
+  grant'i izinli dizin/komutları tanımlıyorsa verilir. Komutlar argv listesiyle
+  platform sandbox'ında çalışır; ağ ve yayın izni ayrıdır. MCP üzerinden verilen
+  yetkiler açık araç izin listesiyle belirlenir.
+- Git, arama, sayfa okuma ve yönetilen Playwright araçları açık araç izni
+  ister. Tarayıcı doğrudan ağa çıkmaz; denetimli web geçidi kullanır.
+- Görev izinleri kuyruğa girerken dondurulur: `readable_paths`, `writable_paths`,
+  `commands`, `allow_network`, `allow_publish`. Yetkisiz dizin/komut reddedilir;
+  model veya süreç çıktısı sınırsız yüklenmez.
 - `request_limit`, `tool_calls_limit`, birikimli `input_tokens_limit`,
   `output_tokens_limit`, `total_tokens_limit` ve
   `timeout_seconds` uygulanır. SDK ve model doğrulama tekrarları sıfırdır.
@@ -146,12 +214,87 @@ canlı doğrulaması ayrıca yapılacaktır.
 .\.venv\Scripts\ragents.exe tasks retry GOREV_KIMLIGI
 ```
 
+Görevler başlık, açıklama, öncelik, etkinlik ve bağımlılık taşır. Kuyruk
+`priority DESC, created_at ASC` sırasıyla çalışır; bağımlılıkları tamamlanmamış
+görev beklemede kalır. Sıradaki veya başarısız görev `tasks edit` ile
+düzenlenebilir; her değişiklik tanım revizyonunu artırır. `tasks archive` ve
+`tasks restore` görev geçmişini silmeden gizler. Markdown görünümü için
+`tasks export`/`tasks import` kullanın:
+
+```powershell
+.\.venv\Scripts\ragents.exe tasks add --agent arastirmaci --title "Rapor" `
+  --priority 5 --depends-on BASKA_GOREV "Raporu hazırla"
+.\.venv\Scripts\ragents.exe tasks edit GOREV_KIMLIGI --priority 9
+.\.venv\Scripts\ragents.exe tasks revisions GOREV_KIMLIGI
+.\.venv\Scripts\ragents.exe tasks export --output gorevler.md
+```
+
+SQLite doğruluk kaynağıdır; Markdown yalnız dışa/içe aktarma görünümüdür.
+Alanlar, bağımlılık kuralları ve sınırlar
+[görev yönetiminde](docs/task-management.md) açıklanır.
+
 `run --key is-001 ...` aynı içerikle tamamlanmış görevin sonucunu yeniden
 model çağırmadan döndürür (`cached: true`). Dönen usage kayıtlı çalışmaya aittir.
 Başarısız görevler kendiliğinden yeniden çalışmaz. Kurtarma aktif süreç kilidine
 dokunmaz; `retry` yalnız sıraya alır. Aktif worker sıradaki görevi alır;
 worker kullanılmıyorsa `tasks run` ile elle çalıştırılır.
 Başarısız/kesilmiş çalışmanın bilinmeyen kısmi tüketimi `null` kalır.
+
+Görevin gerçekten tamamlandığını model beyanından bağımsız denetlemek için
+`--verify-plan` kullanın:
+
+```powershell
+.\.venv\Scripts\ragents.exe tasks add --agent arastirmaci `
+  --verify-plan dogrulama.yaml "Raporu hazırla"
+```
+
+Plan; dosya, JSON şema, argv tabanlı test komutu ve Playwright JSON raporu
+kontrollerini içerebilir. Başarısız kontrol görevi `failed` yapar; model
+sonucu ve kanıt `tasks show` / `tasks result` çıktısında kalır. Biçim, kodlar
+ve sınırlar [görev doğrulamada](docs/task-verification.md) açıklanır.
+
+## Kalıcı ajan kataloğu
+
+`agents` komutları ajan profillerini `local-profile/agents/<id>/` altında saklar;
+her ajanın talimatı, bağlantısı ve izinleri kendi dizinindedir. Katalog, görev
+kuyruğuna girerken o anki profili görev tanımına kopyalar; sonraki profil
+düzenlemesi çalışan görevi değiştirmez.
+
+```powershell
+.\.venv\Scripts\ragents.exe agents create --id arastirmaci --name "Araştırmacı" `
+  --provider ollama --model qwen3:8b --instructions "Türkçe yanıt ver." `
+  --project "Proje kısa bilgisi." --workspace C:\Projeler\OrnekProje
+.\.venv\Scripts\ragents.exe agents update arastirmaci `
+  --add-skill arastirma --add-default-skill arastirma `
+  --add-tool list_files --add-tool search_text --add-tool read_file
+.\.venv\Scripts\ragents.exe agents list
+
+# Yazma ve sınırlı komut izinleri (isteğe bağlı).
+.\.venv\Scripts\ragents.exe agents update arastirmaci `
+  --add-tool write_file --add-tool apply_patch --add-tool run_command `
+  --writable-path src --allowed-command python --allowed-command pytest
+.\.venv\Scripts\ragents.exe tasks add --agent arastirmaci `
+  --writable-path src --allowed-command pytest "Hataları düzelt ve testleri çalıştır"
+.\.venv\Scripts\ragents.exe tasks --root local-profile show <görev-id>
+.\.venv\Scripts\ragents.exe tasks --root local-profile list
+```
+
+Workspace verilmezse `local-profile/workspaces/<ajan-id>/` otomatik oluşturulur;
+özel `--workspace` dizini önceden mevcut olmalıdır. Dosya araçları yalnız
+`agent.yaml` içindeki açık `tools` listesiyle modele verilir; ajan workspace
+dışına çıkamaz, symlink/junction ve kimlik dizinleri reddedilir. Görev sırasında oluşan/değişen dosyalar `tasks show` çıktısındaki
+`artifacts` listesinde izlenir. Ayrıntılar:
+[çalışma alanı ve artifact'lar](docs/workspaces-and-artifacts.md) ve
+[dosya/komut izinleri](docs/tools-and-execution.md).
+
+`--add-skill` kullanmadan önce `local-profile/agents/<id>/skills/<skill-id>/SKILL.md`
+dosyasını oluşturun. `--db` verilmezse katalog komutları veritabanını `--root`
+altında `data/ragents.db` olarak kullanır; `setup` ile üretilen profil kuyruğuyla
+aynı dosyadır. Mevcut `ragents.yaml` dosyasından geçiş için
+`agents create --from-config local-profile/ragents.yaml` kullanın. Talimat
+birleştirme sırası, skill dosya biçimi ve sınırlar için
+[talimatlar ve skill'ler](docs/instructions-and-skills.md); katalog yaşam
+döngüsü için [ajan kataloğu](docs/agents-and-workspaces.md) belgesine bakın.
 
 ## Sürekli servis
 
@@ -192,13 +335,17 @@ işlemi, Codex'in kısıtlı çalıştırma ortamında ek çalıştırma izni ge
 | Ayarlar ve ürün sözleşmeleri | Kapalı Pydantic şeması, bağımsız ajan/bağlantı |
 | Native motor | Pydantic AI 2.64.0, tek ajan, araç döngüsü, sınırlar |
 | Sağlayıcılar | Ollama/OpenRouter, Go/Zen Chat Completions ve Responses; ChatGPT OAuth Responses |
-| Arayüz | `setup`, `doctor`, `check`, `demo`, kalıcı `run`, `tasks`, `worker`, `mcp`, `auth` ve Python servisi |
+| Arayüz | `setup`, `doctor`, `check`, `demo`, kalıcı `run`, `tasks`, `agents`, `sandbox`, `worker`, `mcp`, `auth` ve Python servisi |
 | Kurulum | Sağlayıcı/model, özelleştirilmiş ajan, yerel/isteğe bağlı canlı kontrol, worker/MCP profil dosyaları |
 | Kalıcı kayıtlar | SQLite görev/çalışma/sonuç, idempotency, açık kurtarma ve yeniden deneme |
+| Kalıcı ajan kataloğu | Ajan başına profil, talimat/proje/kural dosyaları, seçilebilir skill, durum ve içerik revizyonu |
+| Çalışma alanı | Ajan başına workspace, izinli okuma/yazma dizinleri, yol sınırları ve artifact kaydı |
+| Sandbox | Windows AppContainer + Job Object, macOS Seatbelt, Linux bubblewrap; ağ/yazma/süreç/kaynak sınırı |
+| Dosya ve komut | `write_file`, `apply_patch`, argv tabanlı `run_command`; yayın izni ayrı, çıktı sınırlı |
 | Sürekli servis | FIFO SQLite kuyruk, tek supervisor, sınırlı eşzamanlılık, iptal, kontrollü kapanış |
 | MCP araçları | Stdio/Streamable HTTP istemcisi, açık izin ve anahtar kelime seçimi, şema/çıktı sınırı |
 | MCP yönetimi | Stdio/loopback HTTP; salt okunur varsayılan, açık execute izni; görev başına bağlantı seçimi |
-| Sandbox, hafıza, çok ajan, panel | Henüz uygulanmadı |
+| Hafıza, ajan ekipleri, panel | Henüz uygulanmadı |
 | Pydantic AI/LangGraph karşılaştırması | Henüz yapılmadı; seçim geçici |
 
 [Mimari ve sonraki adım](docs/architecture.md) dosyası mevcut sınırları açıklar.

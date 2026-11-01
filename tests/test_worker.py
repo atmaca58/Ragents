@@ -13,10 +13,12 @@ def test_worker_drains_fifo_queue_with_bounded_concurrency(tmp_path):
 
     store = TaskStore(tmp_path / "queue.db")
     config = load_config(Path("examples/ollama.yaml"))
-    tasks = [store.enqueue(config, str(index)) for index in range(5)]
+    # Ajan başına seri yürütme korunurken bağımsız ajanlar worker limitini doldurur.
+    tasks = [store.enqueue(config.model_copy(update={"agent": config.agent.model_copy(
+        update={"id": f"agent-{index}"})}), str(index)) for index in range(5)]
     started, active, peak = [], 0, 0
 
-    async def runner(config, prompt, connection_id):
+    async def runner(config, prompt, connection_id, workspace):
         nonlocal active, peak
         started.append(prompt)
         active += 1
@@ -61,7 +63,7 @@ def test_continuous_worker_accepts_later_work_and_stops_cleanly(tmp_path):
     async def scenario():
         stop, finished = asyncio.Event(), asyncio.Event()
 
-        async def runner(config, prompt, connection):
+        async def runner(config, prompt, connection, workspace):
             finished.set()
             return RunResult(agent_id=config.agent.id, output="Tamam", usage=Usage(requests=1, tool_calls=0))
 
@@ -113,7 +115,7 @@ def test_worker_recovers_crash_without_replaying_and_continues_after_failure(tmp
     good = store.enqueue(config, "Yeni")
     calls = []
 
-    async def runner(config, prompt, connection):
+    async def runner(config, prompt, connection, workspace):
         calls.append(prompt)
         if prompt == "Hata":
             raise RuntimeError("private provider details")

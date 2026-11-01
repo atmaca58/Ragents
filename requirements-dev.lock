@@ -7,19 +7,24 @@ charset-normalizer==3.5.2
 click==8.5.0
 colorama==0.4.6
 cryptography==48.0.1
+croniter==6.2.4
 filelock==3.32.7
 genai-prices==0.2.1
+greenlet==3.5.6
 griffelib==2.4.1
 h11==0.16.0
 httpcore2==2.16.0
 httpx2==2.16.0
 idna==3.20
 iniconfig==2.3.1
+playwright==1.64.1
+pyee==14.0.0
 jaraco.classes==3.4.0
 jaraco.context==6.1.2
 jaraco.functools==4.6.0
 jiter==0.18.0
 jsonschema==4.26.0
+json5==0.17.3
 jsonschema-specifications==2025.9.1
 keyring==25.7.0
 logfire-api==5.4.0
@@ -38,9 +43,10 @@ pydantic_core==2.50.2
 Pygments==2.21.0
 PyJWT==2.15.1
 pytest==9.2.0
+python-dateutil==4.0.0
 python-multipart==0.0.33
-pywin32==312
-pywin32-ctypes==0.2.3
+pywin32==312; sys_platform == "win32"
+pywin32-ctypes==0.2.3; sys_platform == "win32"
 PyYAML==6.0.3
 referencing==0.37.0
 regex==2026.9.29
@@ -53,5 +59,7 @@ tiktoken==0.14.0
 truststore==0.10.5
 typing-inspection==0.4.4
 typing_extensions==4.16.0
+tzdata==2026.6
+tomlkit==0.15.2
 urllib3==2.8.0
 uvicorn==0.54.0

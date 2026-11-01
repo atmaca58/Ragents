@@ -66,7 +66,7 @@ def test_cancelling_work_during_mcp_call_closes_connection_and_records_status(tm
             await asyncio.Event().wait()
             return "Bitti"
 
-        async def runner(config, prompt, connection):
+        async def runner(config, prompt, connection, workspace):
             async with open_gateway(config, prompt, connector=lambda spec: Client(server)) as gateway:
                 await gateway.call("tools__wait", {})
 

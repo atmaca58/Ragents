@@ -10,7 +10,8 @@ from ragents.contracts import RunRequest, RunResult, ToolUsage, Usage
 from ragents.engines.context import ContextGuard
 from ragents.engines.mcp_tools import gateway_tools
 from ragents.mcp_client import ToolGateway
-from ragents.tools import TOOL_HANDLERS
+from ragents.tools import build_tools
+from ragents.workspace import ArtifactLog
 
 
 class NativeEngine:
@@ -39,12 +40,16 @@ class NativeEngine:
                 raise UsageLimitExceeded("Token bütçesi tükendi; yeni model isteği gönderilmedi.")
             return {"max_tokens": remaining} if self.request_token_cap else {}
 
+        artifacts = ArtifactLog()
         agent = Agent(
             self.model,
             instructions=request.agent.instructions,
             retries=0,
             capabilities=[ProcessHistory(context.process)],
-            tools=[*[TOOL_HANDLERS[name] for name in request.agent.tools], *gateway_tools(gateway)],
+            tools=[
+                *build_tools(request.agent, request.workspace, artifacts=artifacts),
+                *gateway_tools(gateway),
+            ],
             model_settings=model_settings,
         )
         async with asyncio.timeout(budget.timeout_seconds):
@@ -65,6 +70,7 @@ class NativeEngine:
             output=result.output,
             context=context.report(),
             tools=ToolUsage(selected=len(gateway.tools) if gateway else 0, schema_chars=schema_chars),
+            artifacts=tuple(artifacts.drafts),
             usage=Usage(
                 requests=usage.requests,
                 tool_calls=usage.tool_calls,

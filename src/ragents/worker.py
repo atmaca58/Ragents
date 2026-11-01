@@ -6,6 +6,8 @@ from pydantic import Field
 from ragents.config import Spec
 from ragents.storage import TaskStateError
 from ragents.task_service import TaskService
+from ragents.schedules import ScheduleService
+from ragents.execution_locks import resource_keys, resources_available
 
 
 class WorkerOptions(Spec):
@@ -41,8 +43,11 @@ class Worker:
     async def dispatch(self, stop: asyncio.Event, once: bool) -> None:
         while not stop.is_set():
             self.reap()
+            await asyncio.to_thread(ScheduleService(self.service.store).tick)
+            from ragents.teams import TeamService
+            await asyncio.to_thread(TeamService(self.service.store.path.parent.parent, self.service.store).tick)
             capacity = self.options.concurrency - len(self.active)
-            queued = self.service.store.queued(capacity) if capacity else []
+            queued = self.select_queued(capacity) if capacity else []
             for task in queued:
                 self.active[task.id] = asyncio.create_task(self.service.execute(task.id))
             if once and not queued and not self.active:
@@ -51,6 +56,23 @@ class Worker:
                 await asyncio.wait_for(stop.wait(), self.options.poll_seconds)
             except TimeoutError:
                 pass
+
+    def select_queued(self, capacity: int):
+        store = self.service.store
+        reserved = {key for identity in self.active
+                    for key in resource_keys(store, store.definition(identity))}
+        selected = []
+        for task in store.queued(1000):
+            if len(selected) >= capacity:
+                break
+            if task.id in self.active:
+                continue
+            keys = resource_keys(store, store.definition(task.id))
+            if reserved.intersection(keys) or not resources_available(keys):
+                continue
+            reserved.update(keys)
+            selected.append(task)
+        return selected
 
     def reap(self) -> None:
         for task_id, execution in list(self.active.items()):

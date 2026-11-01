@@ -5,11 +5,13 @@ MCP'sini ekler. Mevcut TaskStore, TaskService, native motor, sağlayıcı/OAuth
 bağlantıları, token/bağlam politikaları ve saf `text_stats` aracı yeniden
 kullanılır. V1'in salt okunur MCP başlangıç, açık yazma yetkisi ve ince sunucu
 desenleri V2'ye uygulanır. V1 çalışma motoru, kişisel ajanlar, canlı DB ve OAuth
-sunucusu kopyalanmaz; MCP protokolünü resmi SDK sağlar.
+sunucusu kopyalanmaz; MCP protokolünü resmi SDK sağlar. Komut örnekleri Windows
+PowerShell/`.exe` biçimindedir; macOS/Linux karşılıkları
+[platform desteğindedir](platform-support.md).
 
 ## 1. Sürekli worker
 
-Komutları `C:\Projeler\Ajan\Ragents` dizininden çalıştırın:
+Komutları `C:\RAgents-Kaynak` dizininden çalıştırın:
 
 ```powershell
 .\.venv\Scripts\ragents.exe worker --db data/ragents.db --concurrency 2 --poll-seconds 0.5 --shutdown-seconds 10
@@ -50,7 +52,9 @@ Ctrl+C / SIGTERM yeni iş almayı durdurur. Aktif işlere `--shutdown-seconds`
 kadar bitirme süresi verilir, sonra kalan async işler iptal edilir. Bekleyen
 işler kuyrukta kalır. Bu işbirlikçi async iptaldir; event loop'u bloke eden veya
 iptali yutan üçüncü taraf koduna sert süreç izolasyonu sağlamaz. MCP stdio
-süreçlerinin kapatılması/sonlandırılması SDK'ya aittir.
+süreçlerinin kapatılması/sonlandırılması SDK'ya aittir. A04 sandbox'ı bu
+stdio MCP süreçlerini kapsamaz; harici araç sunucusunun kendi yetkisi ayrıca
+değerlendirilir. Ayrıntılar [sandbox sınırı](sandbox.md).
 
 Başarısız iş diğer işleri durdurmaz. Hata ayrıntısı yerine güvenli hata kodu
 DB'ye kaydedilir. Tekrar için `tasks retry GOREV_KIMLIGI` kullanılır. Worker
@@ -107,6 +111,8 @@ Stdio bağlantısında `transport: stdio`, `command`, `args`, isteğe bağlı `c
 olarak çalıştırılmaz. SDK'nın temel sistem ortamı dışında yalnız `env_vars`
 isimleriyle seçilen değerler iletilir. Anahtarı URL, args veya YAML içine
 yazmayın; yalnız ortam değişkeninin adını yazın. `.env` otomatik yüklenmez.
+Yerel Python sunucusu için tam `command: "{python}"` değeri, çalışan R Agents
+yorumlayıcısını seçer; Windows/macOS/Linux venv yolu yazmak gerekmez.
 Göreceli yollar worker'ın çalışma dizinine göredir; dağıtımda mutlak yol önerilir.
 
 Uzak HTTP için HTTPS gerekir; düz HTTP yalnız loopback adreslerine açıktır.
@@ -152,20 +158,25 @@ V2 yönetim MCP'si de aynı TaskStore'u kullanır; yeni bir çalışma motoru yo
 Yerel MCP istemcinizde şu komutu stdio sunucusu olarak tanımlayın:
 
 ```powershell
-C:\Projeler\Ajan\Ragents\.venv\Scripts\ragents.exe mcp serve --db C:\Projeler\Ajan\Ragents\data\ragents.db --config C:\Projeler\Ajan\Ragents\examples\chatgpt-luna.yaml
+C:\RAgents-Kaynak\.venv\Scripts\ragents.exe mcp serve --db C:\RAgents-Kaynak\data\ragents.db --config C:\RAgents-Kaynak\examples\chatgpt-luna.yaml
 ```
 
 Varsayılan araçlar: `list_agents`, `list_tasks`, `get_task`, `get_result`.
-Ajanlar `--config` ile açıkça kaydedilir; birden fazla örnek ajan için bu argüman
-tekrar edilir. MCP istemcisi keyfi ayar dosyası yolu veya ajan spec'i gönderemez.
+`get_task`, görev/çalışma metadatasıyla birlikte bağımlılıkları, `blocked_by`
+listesini, `ready` durumunu ve görevle ilişkili artifact kayıtlarını da
+döndürür. Ajanlar `--config` ile açıkça kaydedilir; birden fazla
+örnek ajan için bu argüman tekrar edilir. MCP istemcisi keyfi ayar dosyası yolu
+veya ajan spec'i gönderemez.
 
 Görev gönderme/iptal/yeniden deneme için sunucu komutuna **`--allow-execute`**
 ekleyin. Böylece `submit_task(agent_id, prompt, key)`, `cancel_task(task_id)` ve
-`retry_task(task_id)` görünür. `key` zorunludur, aynı içerikle tekrar gönderim
-aynı görevi döndürür. Farklı içerikle aynı anahtar reddedilir. `submit_task`
-modeli MCP isteğinde çalıştırmaz; yalnız sıraya alır. Aynı DB'de ayrı çalışan
-worker işi alır; durum/sonuç sonradan sorgulanır. Worker yoksa iş sırada bekler.
-Çalıştırma izni, kayıtlı ajanların model ve araç yetkilerini kullanma iznidir.
+`retry_task(task_id)` görünür. `submit_task` isteğe bağlı `title`, `description`,
+`priority` ve `depends_on` alanlarını kabul eder. `key` zorunludur, aynı
+içerikle tekrar gönderim aynı görevi döndürür. Farklı içerikle aynı anahtar
+reddedilir. `submit_task` modeli MCP isteğinde çalıştırmaz; yalnız sıraya alır.
+Aynı DB'de ayrı çalışan worker işi alır; durum/sonuç sonradan sorgulanır. Worker
+yoksa iş sırada bekler. Çalıştırma izni, kayıtlı ajanların model ve araç
+yetkilerini kullanma iznidir.
 
 Yönetim yüzeyi sonradan **stdio ve loopback Streamable HTTP** olarak genişletildi.
 `submit_task` isteğe bağlı `connection_id` ile kayıtlı model kaynağını seçer;
@@ -175,9 +186,11 @@ Uygulama OAuth'u ve çok kullanıcılı ekip yetkilendirmesi henüz yoktur.
 
 ## Veri ve uyumluluk
 
-- Şema sürümü 1'den 2'ye veri silmeden yükselir; yalnız iptal tablosu ve kuyruk
-  indeksi eklenir. Önceki ayarlara eklenen varsayılan MCP alanları eski
-  idempotency anahtarlarını bozmaz. Görev tanımı enqueue anındaki ayarın kopyasıdır.
+- Şema sürümü 1'den 5'e veri silmeden yükselir; iptal tablosu, kuyruk indeksi,
+  artifact ve doğrulama tabloları, görev metadata sütunları, bağımlılık grafiği
+  ve tanım revizyonları eklenir. Önceki ayarlara eklenen varsayılan MCP alanları
+  eski idempotency anahtarlarını bozmaz. Görev tanımı enqueue anındaki ayarın
+  kopyasıdır.
 - Görev talimatı, ayar ve sonuç ürün verisi olarak V2 DB'de düz metindir.
   Çözülen ortam anahtarları ve OAuth tokenları DB'ye/çalışma metadatasına alınmaz.
 - Başarısız/iptal edilmiş isteğin bilinmeyen kısmi tüketimi `null` kalır.

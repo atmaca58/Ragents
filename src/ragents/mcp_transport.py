@@ -2,6 +2,7 @@ import asyncio
 from contextlib import AsyncExitStack, asynccontextmanager
 import json
 import os
+import sys
 from typing import Any
 
 from jsonschema.validators import validator_for
@@ -25,7 +26,8 @@ def environment_value(name: str) -> str:
 async def connect_mcp(spec: MCPConnection):
     async with AsyncExitStack() as stack:
         if isinstance(spec, StdioMCP):
-            params = StdioServerParameters(command=spec.command, args=list(spec.args), cwd=spec.cwd,
+            command = sys.executable if spec.command == "{python}" else spec.command
+            params = StdioServerParameters(command=command, args=list(spec.args), cwd=spec.cwd,
                                           env={name: environment_value(name) for name in spec.env_vars})
             error_log = stack.enter_context(open(os.devnull, "w"))
             transport = stdio_client(params, errlog=error_log)

@@ -1,0 +1,213 @@
+# Windows ürün uygulaması — 1–2 Kasım 2026
+
+## 2 Kasım: GitHub geliştirme yayını ve tek komut
+
+Kullanıcı mevcut geliştirmeyi şimdi GitHub'a commit/push etmeyi, depoyu
+herkese açık yapmayı ve hesap gerektirmeyen tek komutla kurulumu açıkça istedi.
+Önceki kabul-sonrası-yayın sırası bu geliştirme yayını için değişti; ürünün
+tam kabulü ve kişisel ajan geçişi yapılmış sayılmaz.
+
+`scripts/install.ps1`, sabit `v0.2.0-dev.20261102.1` manifesti ve SHA-256 ile
+uygulama/Python/Git/pip varlıklarını doğrular; bağımlılıklar PyPI'den, sabit
+Playwright tarayıcısı resmi CDN'den gelir. Sistemde Python/Git/ajan istemcisi
+gerekmez. Yalnız uygulama wheel'i, kendi launcher'larımız, bağımlılık kilidi,
+manifest ve checksum yayımlanır; üçüncü taraf çalışma zamanları bu çevrimiçi
+kurulum paketinde yeniden dağıtılmaz.
+
+Windows PowerShell 5.1 ile ayrı geçici uygulama/profil kökünde gerçek indirme,
+paket kurma, tarayıcı kurma, şema sağlığı ve etkin sürüm seçimi geçti. Yeni
+kurulumun EXE'siyle MCP 25 aracı keşfetti; model isteği 0. Hash reddi ve arşiv
+yol kaçışı regresyonları geçti. Kullanıcı PATH'i, gerçek istemci ayarı ve
+varsayılan kullanıcı profili değiştirilmedi. Geçici kurulum testten sonra
+kaldırılacak; bilgisayarda varsayılan ürün kurulumu bulunmadı.
+
+Komut ve geliştirme sürümünün sınırları [terminal rehberindedir](terminal-quickstart.md).
+
+Bu kayıt, onaylanan [ürün teslim sözleşmesinin](product-delivery.md) uygulanan
+bölümünü ve henüz kapanmayan teslim kapılarını ayırır. Ürün henüz yayıma hazır
+değildir. Kişisel ajanlar taşınmadı ve V1 değiştirilmedi.
+
+## Güncel terminal akışı
+
+Kurulum/yönetim için ürün web paneli kaldırıldı. Ana akış
+`ragents init` → `ragents connect codex|opencode|claude|claude-desktop` →
+MCP taslağı → `ragents approvals` ile yerel terminal onayıdır.
+Sağlayıcının resmi OAuth sayfası ve istemcinin zorunlu hesap onayı korunur.
+Kullanım [terminal rehberindedir](terminal-quickstart.md).
+
+VM/ISO hazırlanmayacak. Çevrimdışı kontrollerin ardından kullanıcının kendi
+Windows bilgisayarında kurulum ve gerçek istemci/hesap testleri yapılacak.
+Bu testler temiz makine/VM kanıtı olarak sunulmayacak. Ek ücretli model test
+bütçesi 0 USD; kota tükenirse koşu durur. GitHub yayını ve kişisel geçiş yapılmadı.
+
+Bu turda eklenen ve hedef regresyonları bulunan davranışlar:
+
+- Merkezi model/arama bağlantıları, kasa referansları ve YAML gerektirmeyen
+  `connections test`; varsayılan tanılama model isteği göndermez.
+- MCP kurulum taslağı; profil revizyonu/hash/süreye bağlı tek kullanımlık onay.
+  Gerçek terminal zorunlu; pipe/MCP onay veremez. Kesintiden sonra uygulama
+  tekrar edilebilir; tamamlanma işareti olmadan yeni ajan çalıştırılamaz.
+- Codex/OpenCode/Claude kullanıcı ayarlarına yedekli MCP kaydı, salt okunur
+  seçenek ve model kullanmayan stdio el sıkışması. Dış istemci kabulü açık.
+- Kontrollü DAG ekipleri, mevcut kuyrukta çocuklar, ortak bütçe rezervasyonu,
+  kalıcı iptal ve zorunlu bağımsız final doğrulaması. Yerel onaylı tam eşit
+  workspace paylaşımı aynı kanonik kilidi kullanır.
+- Hash'li değişmez artifact deposu ve MCP'den sayfalı okuma. Ekip devri izinli
+  artifact kimliklerinden sınırlı metin önizlemesi taşır; tam dosya devri açık.
+- Git durum/diff/branch/worktree/commit, Tavily/Brave/SearXNG adaptörleri,
+  DNS'e sabitlenmiş sayfa okuma ve ayrı AppContainer içinde ağsız Chromium.
+  Playwright gerçek assertion/ekran görüntüsü testi native Windows'ta geçti.
+- Uzak MCP OAuth: PKCE, resource/audience, kapsam kontrolü, terminalden ilk
+  eşleştirme, kısa ömürlü erişim ve yenileme/iptal. Gerçek tünel kabulü açık.
+- Sürümlü profil paketi; hash/allowlist, workspace eşleme önizlemesi, secret ve
+  onayların dışarıda kalması, içe alınan ajan/takvimlerin kapalı başlaması.
+- Task Scheduler supervisor, süreç ağacı temizliği, sınırlı yeniden başlatma;
+  yedek/sağlık/etkin sürüm değiştirme ve başarısızlıkta uygulama/veri dönüşü.
+- Sabit embedded Python/MinGit/Chromium ile allowlist kaynak paketi ve Inno EXE
+  geliştirme paketi üretildi. Kullanıcının makinesine R Agents kurulmadı.
+
+Şema `storage.SCHEMA_VERSION = 8`; aşağıdaki ilk uygulama kaydındaki v7 ve
+252 test sayısı önceki tabandır. Son regresyon kanıtı ayrı güncellenir.
+
+Güncel terminal regresyonu: **295 geçti / 3 atlandı**, 282,38 saniye.
+Atlamalar iki Windows symlink yetki testi ve bir POSIX sandbox testidir.
+`pip check` temiz. Ayrı staging paketinde embedded Python, sistem PATH'inde
+yalnız System32 varken `--version`, sahte `demo` ve `init --help` geçti.
+Bu kontroller kurucunun kullanıcı bilgisayarına kurulduğu anlamına gelmez.
+
+Sonraki yetki düzeltmesinde `connect chatgpt --read-only` seçiminin supervisor
+tarafından korunması eklendi; yetki alanı olmayan eski uzak ayarlar yazma
+yetkisi kazanmaz. İlgili terminal, supervisor, MCP ve OAuth setinde **22 test
+geçti**. Tam 295/3 koşusu bu son dar düzeltmeden önceki tabandır.
+
+Gerçek paket EXE kontrolü, yönlendirilmiş Windows çıktısında `→` karakterinin
+CP1254 hatasına yol açtığını buldu. CLI stdout/stderr UTF-8 olarak sabitlendi;
+terminal, istemci kaydı, supervisor, MCP ve CLI setinde **22 test geçti**.
+Üretim importu/mutasyon kontrolü toplam **20 farklı hedefte** geçti; dosyalar
+her mutasyondan sonra byte düzeyinde geri yüklendi.
+
+Son staging (`terminal-4`) EXE'siyle, PATH yalnız System32 iken ayrı geçici
+profilde `init --non-interactive`, `connections test primary` ve geçici Codex
+ayarında `connect codex --test` geçti. MCP 25 aracı keşfetti; model isteği
+sayısı 0. Kullanıcının gerçek istemci ayarı değiştirilmedi; bu, Codex
+uygulamasıyla uçtan uca kabul değildir. UTF-8 çıktısı paket EXE'sinde de geçti.
+
+Güncel geliştirme kurucusu `dist/terminal-current/R-Agents-0.2.0.dev1-windows-x64.exe`
+olarak derlendi (214.445.391 byte). SHA-256:
+`339a0dd5a75d343bdf794a841d78b775e83237fda0d631c6dd74e0c6e85a51f0`.
+Yanında checksum dosyası vardır. Bu imzasız geliştirme adayı kurulmadı,
+kabul edilmiş release veya GitHub yayını değildir. Önceki `terminal-preview`
+paketi son düzeltmeleri içermez; kullanıcı kurulumu için kullanılmamalıdır.
+
+## Uygulanan davranışlar
+
+- Endpoint userinfo/query/fragment reddi ortak bağlantı şemasında.
+- Büyük dosyanın ilerleyen satırlarını sınırlı taramayla okuma.
+- Doğrulama başarısızlığında açık run durumu ve CLI hata çıkış kodu.
+- Snapshot sırasında kaydedilen iptalden sonra runner başlatmama.
+- Sandbox çağrısına özgü iptal kontrolü, başlangıç kapısı ve thread temizliğini bekleme.
+- Her Windows yürütmesinde yeni AppContainer kimliği; çalışma sonrası kendi ACL/profile temizliği.
+- POSIX ana süreç çıkmış olsa da süreç grubunu temizleme; macOS native kanıtı hâlâ yok.
+- Markdown'da başlıktan bağımsız `ref` ve bağımlılık kimlikleri; eski başlıklı import korunur.
+- Manuel/worker ortak ajan ve kanonik workspace kilitleri; meşgul proje ardındaki bağımsız işin seçilmesi.
+- Ortak kullanıcı profil kökü, açık profil bağlamının kimlik deposuna taşınması.
+- Şema v7: kalıcı tek seferlik/cron takvimi ve hafıza revizyonları; saat dilimi, tek slot telafisi ve kesinti sonrası idempotency.
+- Kapalı kayıtlı `runtime_health` ve `workspace_inventory` işleri; sıfır model isteği.
+- Katalog ajanlarını MCP'den canlı keşif, workspace/talimat/doğrulama snapshot'ıyla görev atama.
+- MCP'den programatik görev ve takvim; çalıştırma araçları hâlâ açık `--allow-execute` ister.
+- Kaynak/revizyonlu talimat snapshot'ı korunarak anahtar sözcüklü ilgili skill seçimi.
+- Bağımsız doğrulanmış çalışmadan hafıza adayı; yerel açık onay, revizyon,
+  düzeltmede onayı kaldırma, arşiv ve anahtar sözcükle seçici yükleme.
+  MCP adayı yazabilir fakat onay veremez; `--allow-write` çalıştırma yetkisi değildir.
+- SQLite backup API ile WAL dahil tutarlı görev DB yedeği; mevcut DB üzerine yazmadan geri yükleme.
+- Apache-2.0 lisans metni ve NOTICE; üçüncü taraf dağıtım bildirimleri yayın kapısında ayrıca üretilecek.
+
+## Kullanıcı profili ve uyumluluk
+
+Varsayılan kök `%LOCALAPPDATA%/RAgents/profiles/default` olur. `RAGENTS_HOME`
+ve komuttaki açık `--root` seçimi desteklenir. Açık kök > işlem profil bağlamı
+> ortam > varsayılan sırası uygulanır. `setup --directory` profil seçimi,
+üretilen worker/MCP başlatıcılarına da taşınır. Göreli yollar bağımlı olunan
+mevcut çalışma dizinine göre değil, açık seçimin kanonik yoluna sabitlenir.
+
+Eski `local-profile`, `data/ragents.db` veya `~/.ragents` kendiliğinden okunup
+taşınmaz. Mevcut kullanıcılar eski profili açık `--root` ile seçmeli; eski
+kimlik konumu farklıysa yeni profilde giriş yapmalıdır. `--config` korunur;
+aynı kimlikte katalog ajanı varsa katalog doğruluk kaynağıdır.
+
+Windows ilk ürün hedefidir. POSIX kaynakları korunur fakat macOS/Linux
+deneyseldir; Windows'ta sahte platform testi native kabul kanıtı değildir.
+
+## Komutlar
+
+```powershell
+# Profil durumunu DB oluşturmadan oku
+ragents profile --root C:\RAgents-Profil status
+
+# Görev DB'sinin tutarlı yedeği; çıktı dosyası yeni olmalıdır
+ragents profile --root C:\RAgents-Profil backup --output C:\Yedekler\gorevler.db
+ragents profile restore --backup C:\Yedekler\gorevler.db --output C:\Deneme\data\ragents.db
+
+# Model kullanmayan görev; yalnız kaydet
+ragents tasks --root C:\RAgents-Profil add --config ornek.yaml --handler runtime_health --disabled "Sağlık özeti"
+ragents schedules --root C:\RAgents-Profil add --task GOREV_KIMLIGI --cron "0 9 * * *" --timezone Europe/Istanbul
+ragents schedules --root C:\RAgents-Profil list
+
+# Hafıza adayını gösterdikten sonra yalnız görülen revizyonu onayla
+ragents memory --root C:\RAgents-Profil list --agent analist
+ragents memory --root C:\RAgents-Profil show KAYIT_KIMLIGI
+ragents memory --root C:\RAgents-Profil approve KAYIT_KIMLIGI --revision 1
+```
+
+Takvim şablonu devre dışı, arşivsiz, sırada bir görev olmalıdır. Tanım ve
+metadata takvime kopyalanır; şablonu sonradan düzenlemek takvimi değiştirmez.
+Worker zamanı gelen işleri aynı kuyruğa ekler. `--once` gelecekteki slotu
+beklemez. `catch_up=true` uzun kesintide son slotu bir kez telafi eder;
+`--no-catch-up` bir dakikadan eski slotu atlar. Başarısız işler kör tekrar
+edilmez. Takvimi kapatmak önceden kuyruğa girmiş görevleri iptal etmez.
+
+DB yedeği görev metinleri/sonuçları gibi hassas kullanıcı verisi içerir.
+Kimlik kasası, ajan dosyaları ve workspace bu komutun kapsamına girmez;
+bu, henüz tam taşınabilir profil paketi değildir. Geri yükleme yalnız yeni
+DB'ye yapılır; daha yeni şema reddedilir. Aktif çalışmanın yedekteki durumu
+worker kurtarmasında kesilmiş olarak ele alınır, otomatik yeniden yürütülmez.
+
+## Açık teslim kapıları
+
+- MCP'den mevcut ajan/talimat/skill güncelleme taslağı ve onaylı uygulama.
+- Ekipte büyük/binary artifact'ın salt okunur giriş alanına tam aktarımı;
+  ölçülen tüketim ile aktif rezervasyonun raporda açık ayrılması.
+- Genel komut yayın izninin yerine doğrulanmış commit/artifact hash'ine bağlı
+  ayrı yerel yayın onayı; mevcut `allow_publish` tek başına yeterli olmamalı.
+- Supervisor durum/durdurma ve güncelleme sonrası yeniden kayıt/başlatma;
+  güncelleme kesintisinden açık kurtarma ve tam profil tutarlılığı denetimi.
+- Uzak kapsam keşfi/iptal ergonomisi ve gerçek ChatGPT OAuth/tünel kabulü.
+  Kimliksiz loopback HTTP genel internete açılmamalıdır.
+- Son koddan yeni release adayı, tam paket içerik denetimi, üçüncü taraf/GPL
+  kaynak ve bildirimlerinin tamamlanması, SBOM ve Windows paketleme CI kapısı.
+- Kullanıcının yerel Windows bilgisayarında EXE kurulumu, gerçek Codex/ChatGPT,
+  sağlayıcı/arama hesabı ve sürümlü 20 senaryonun üç tekrarı. Native geliştirme
+  testi bunların yerine geçmez; VM yapılmayacak.
+- Kabul edilmiş aynı hash'li dosyanın GitHub yayını; ardından yayımlanan
+  kurucuyla sıfırdan kurulum ve en son kişisel ajan geçişi.
+
+Bu eksikler tamamlanmadan ürün için “hazır” veya “kurucu tamam” denmez.
+
+Hafıza için başarılı model sonucu yeterli değildir: aynı ajanın `passed`
+doğrulama kaydı gerekir ve aday ayrıca yerel kullanıcı onayı bekler. JSON
+şema doğrulaması olgusal doğruluğu tek başına kanıtlamaz; onaylayan kullanıcı
+iddia ile kaynağı birlikte incelemelidir. Metin değişikliği yeni revizyon ve
+yeni onay gerektirir. Görev başına en fazla sekiz kayıt/3000 karakter seçilir;
+kalıcı kural dosyaları hafıza işlemiyle değiştirilmez.
+
+## Doğrulama
+
+Güncel tam regresyon: **252 geçti / 3 atlandı, 255 senaryo** (203,30 saniye).
+İlk ara koşu 239/3 idi; son sayı hafıza ve son profil/MCP testlerini kapsar.
+Editable paket standart build izolasyonuyla yeniden kuruldu; `pip check` temiz.
+
+`scripts/check_product_provenance.py`, hedef regresyonların üretim importlarını,
+gölgeleme olmadığını ve üretim fonksiyonu bozulunca testin düştüğünü kontrol
+eder. **15 hedefte kontrol geçti.** Her mutasyonun ardından dosya byte
+düzeyinde geri yüklenir. Gerçek model, kullanıcı kasası, temiz Windows kurucu
+ve uzak istemci/tünel kabulü yapılmadı.

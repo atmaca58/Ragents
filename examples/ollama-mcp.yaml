@@ -6,7 +6,7 @@ connections:
 mcp_servers:
   local-tools:
     transport: stdio
-    command: .venv/Scripts/python.exe
+    command: "{python}"
     args: [examples/tool-server.py]
     timeout_seconds: 10
 agent:

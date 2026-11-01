@@ -3,13 +3,15 @@
 Yönetici istemci görev oluşturur, durumu sorgular, sonucu alır ve iptal eder.
 Görevi aynı SQLite kuyruğundan bağımsız worker yürütür. İstemcinin kendi modeli
 ile R Agents görevinin modeli ayrı seçilir: örneğin Codex, R Agents'a Luna veya
-Ollama kullanan bir görev gönderebilir. MCP sunucusu ayrıca LLM çağırmaz.
+Ollama kullanan bir görev gönderebilir. MCP sunucusu ayrıca LLM çağırmaz. Komut örnekleri Windows PowerShell/`.exe`
+biçimindedir; macOS/Linux karşılıkları
+[platform desteğindedir](platform-support.md).
 
 ## 1. Worker'ı başlat
 
 ```powershell
-cd C:\Projeler\Ajan\Ragents
-.\.venv\Scripts\ragents.exe worker --db C:\Projeler\Ajan\Ragents\data\ragents.db --concurrency 2
+cd C:\RAgents-Kaynak
+.\.venv\Scripts\ragents.exe worker --db C:\RAgents-Kaynak\data\ragents.db --concurrency 2
 ```
 
 Worker açık kaldıkça yeni görevleri alır. Aynı veritabanında ikinci worker
@@ -30,7 +32,7 @@ Codex stdio/HTTP ayarları [resmî MCP rehberindedir](https://learn.chatgpt.com/
 Sunucuyu elle başlatmak için:
 
 ```powershell
-.\.venv\Scripts\ragents.exe mcp serve --db C:\Projeler\Ajan\Ragents\data\ragents.db --config C:\Projeler\Ajan\Ragents\examples\management.yaml --allow-execute
+.\.venv\Scripts\ragents.exe mcp serve --db C:\RAgents-Kaynak\data\ragents.db --config C:\RAgents-Kaynak\examples\management.yaml --allow-execute
 ```
 
 Bu stdio komutu JSON-RPC istemcisi bekler; terminale normal sohbet yazılmaz.
@@ -42,17 +44,20 @@ kaydetmek için `--config` tekrarlanır; ajan kimlikleri farklı olmalıdır.
 | Araç | Girdi | Davranış |
 | --- | --- | --- |
 | `list_agents` | yok | Ajanlar, varsayılan bağlantı ve seçilebilir bağlantı kimliği/sağlayıcı/model |
-| `list_tasks` | `limit` (varsayılan 50, en fazla 1000) | Son görevler ve durumları |
-| `get_task` | `task_id` | Görev durumu, çalışma kimlikleri, sağlayıcı/model ve kullanım kayıtları |
+| `list_tasks` | `limit` (varsayılan 50, en fazla 1000) | Son görevler, metadata ve durumları |
+| `get_task` | `task_id` | Görev metadata'sı, çalışma kimlikleri, sağlayıcı/model, kullanım, bağımlılıklar, `blocked_by`, `ready` ve artifact kayıtları |
 | `get_result` | `run_id` | Başarılı çalışmanın kalıcı sonucu ve kullanım bilgisi |
-| `submit_task` | `agent_id`, `prompt`, `key`, isteğe bağlı `connection_id` | Görevi kuyruğa ekler |
+| `submit_task` | `agent_id`, `prompt`, `key`, isteğe bağlı `connection_id`, `title`, `description`, `priority`, `depends_on` | Görevi kuyruğa ekler |
 | `cancel_task` | `task_id` | Bekleyeni iptal eder; çalışana iptal isteği kaydeder |
 | `retry_task` | `task_id` | Başarısız/kesilmiş/iptal edilmiş işi yeniden sıraya alır |
 
 Son üç araç açık `--allow-execute` izni gerektirir. Görev talimatı 1–32.000
 karakter ve boşluk dışında içerik taşımalıdır; `key` boş olamaz ve en fazla
-200 karakterdir. Aynı anahtar ve içerik aynı görevi döndürür. Bağlantı dahil
-içerik değişirse aynı anahtar reddedilir; yeni görev için yeni anahtar kullanın.
+200 karakterdir. Aynı anahtar ve içerik aynı görevi döndürür. Bağlantı,
+metadata veya bağımlılık değişirse aynı anahtar reddedilir; yeni görev için yeni
+anahtar kullanın. `depends_on` yalnız aynı veritabanındaki görevleri kabul eder;
+bağımlılığı tamamlanmamış görev `ready: false` görünür ve worker onu almaz.
+`priority` büyük değer önce çalışır.
 
 Örnek [management.yaml](../examples/management.yaml), `assistant` ajanına
 `luna` ve `local` bağlantılarını tanımlar. `connection_id` verilmezse `luna`
@@ -92,7 +97,7 @@ garanti edilmez. Retry uzaktaki işlemi yeniden yapabilir.
 HTTP sunucusu aynı araçları **yalnız `127.0.0.1` üzerinde** sunar:
 
 ```powershell
-.\.venv\Scripts\ragents.exe mcp serve --transport streamable-http --port 8765 --db C:\Projeler\Ajan\Ragents\data\ragents.db --config C:\Projeler\Ajan\Ragents\examples\management.yaml --allow-execute
+.\.venv\Scripts\ragents.exe mcp serve --transport streamable-http --port 8765 --db C:\RAgents-Kaynak\data\ragents.db --config C:\RAgents-Kaynak\examples\management.yaml --allow-execute
 ```
 
 Yerel adres `http://127.0.0.1:8765/mcp` olur. MCP SDK'nın Host/Origin koruması

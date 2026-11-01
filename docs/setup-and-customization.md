@@ -7,14 +7,36 @@ başlatmaz; görev göndermek model ve araç kullanımına yol açabilir.
 
 ## Tek kurulum akışı
 
+Windows, macOS ve Linux için ortak kurucu `scripts/setup.py` eklendi.
+macOS/Linux'ta `python3 scripts/setup.py`, worker için
+`.venv/bin/python local-profile/start-worker.py` kullanılır. Windows'ta
+`python scripts/setup.py` veya aşağıdaki PowerShell sarmalayıcısı kullanılabilir.
+[Platform ayrımları ve doğrulama sınırları](platform-support.md).
+Sandbox için macOS'ta `/usr/bin/sandbox-exec`, Linux'ta `bwrap` gerekir;
+Windows AppContainer ilk çalıştırmada Python dizinine salt okunur ACL verir.
+Ayrıntılar [sandbox rehberindedir](sandbox.md). Ajan profiline yazma veya
+komut aracı eklerken görev izinlerini de tanımlayın; ayrıntılar
+[dosya ve komut rehberindedir](tools-and-execution.md).
+
 Windows PowerShell'de, Python 3.12–3.14 kurulu olmalıdır:
 
 ```powershell
-cd C:\Projeler\Ajan\Ragents
+cd C:\RAgents-Kaynak
 .\scripts\setup.ps1
 ```
 
-Script sanal ortamı/bağımlılıkları kurar ve Türkçe sihirbazı açar. Sağlayıcı
+macOS/Linux'ta:
+
+```sh
+cd /path/to/Ragents
+python3 scripts/setup.py
+# veya:
+sh scripts/setup.sh
+```
+
+Script sanal ortamı/bağımlılıkları kurar ve Türkçe sihirbazı açar. Belgedeki
+`.exe` ve PowerShell komutları Windows içindir; macOS/Linux'ta `.venv/bin/ragents`
+ve `.venv/bin/python` kullanın. Sağlayıcı
 kimliği (`chatgpt`, `opencode_go`, `opencode_zen`, `openrouter`, `ollama`),
 hesabınızda erişilebilir model kimliği, ajan kimliği/adı/talimatı sorulur.
 Model erişimi hesaba göre değişir; kurulum model indirmez veya seçimi sessizce
@@ -42,13 +64,14 @@ tüketebilir. Kurulumun normal beklemesi ve ayar üretimi model çağırmaz.
 Varsayılan dizin `Ragents/local-profile/`; `-ProfileDirectory` ile değişir:
 
 ```powershell
-.\scripts\setup.ps1 -ProfileDirectory C:\Projeler\Ajan\Ragents\my-profile
+.\scripts\setup.ps1 -ProfileDirectory C:\RAgents-Kaynak\my-profile
 ```
 
 | Dosya | Kullanım |
 | --- | --- |
 | `ragents.yaml` | Sağlayıcı/model, örnek ajan, talimat ve bütçeler |
 | `start-worker.ps1` | Bu profilin kuyruğunu sürekli işleten worker |
+| `start-worker.py` / `start-worker.sh` | Ortak Python / POSIX worker başlatıcıları |
 | `mcp-client.json` | Genel stdio MCP istemci kaydı |
 | `codex-mcp.toml` | Codex ayarlarına eklenecek MCP kaydı |
 
@@ -56,6 +79,15 @@ Tüm yollar mutlaktır; kuyruk `profil/data/ragents.db` olur. DB, worker/MCP
 başlatıldığında oluşur. Mevcut projedeki `Ragents/data/ragents.db` kuyruğundan
 ayrıdır. Mevcut profil dizininin üzerine yazılmaz; tekrar kurulum için yeni
 dizin kullanın, mevcut ayarı değiştirmek için YAML'yi düzenleyin.
+
+Kalıcı ajan kataloğu ayrı bir opt-in yoldur. Sihirbazın ürettiği `ragents.yaml`
+dosyasını `agents create --from-config local-profile/ragents.yaml` ile kataloğa
+aktarabilirsiniz; aktarım sonrası proje bilgisi ve skill dosyaları ajan dizinine
+eklenir, çalışma alanı varsayılan olarak `local-profile/workspaces/<ajan-id>`
+altında oluşturulur. Ayrıntılar [ajan kataloğu](agents-and-workspaces.md),
+[talimatlar ve skill'ler](instructions-and-skills.md),
+[çalışma alanı ve artifact'lar](workspaces-and-artifacts.md) ve
+[README](../README.md) içindedir.
 
 Kurulumdan sonra:
 
@@ -141,8 +173,9 @@ görevler gönderildikleri andaki ayarı korur.
 ## Bu aşamanın sınırı
 
 Yerel servis kurulum ve yönetim akışı hazırdır. Windows otomatik servis
-kaydı, uygulama düzeyinde uzak MCP OAuth'u/ekip yetkileri, sandbox, çoklu ajan
-iş birliği ve bağımsız görev çıktısı doğrulama henüz uygulanmadı. Bunlar
+kaydı, uygulama düzeyinde uzak MCP OAuth'u/ekip yetkileri ve çoklu ajan
+iş birliği henüz uygulanmadı. Sandbox ve bağımsız görev doğrulaması mevcut;
+tarayıcı doğrulaması için gerçek Playwright kurulumu ayrıca gerekir. Bunlar
 çalışan yerel çekirdeğin sonraki aşamalarıdır; üretim olgunluğu iddiası yoktur.
 Yeni sihirbaz çevrimdışı testlerle doğrulanmıştır; bu aşamada gerçek sağlayıcı
 isteği, tarayıcı girişi veya temiz makinede yeniden bağımlılık kurulumu yapılmadı.

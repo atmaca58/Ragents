@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "python": {
+    "filename": "python-3.14.10-embed-amd64.zip",
+    "url": "https://www.python.org/ftp/python/3.14.10/python-3.14.10-embed-amd64.zip",
+    "sha256": "90905e64a840557d8c1bc4f5b74db3d7ee85e3ffb217611cac1c7813acea4159"
+  },
+  "git": {
+    "filename": "MinGit-2.56.0.4-64-bit.zip",
+    "url": "https://github.com/git-for-windows/git/releases/download/v2.56.0.windows.4/MinGit-2.56.0.4-64-bit.zip",
+    "sha256": "e3bf78351fe777fba47ddee5950082f8a98bb0f02604fdc7ba3ee2cb68ffa877"
+  },
+  "compiler": {
+    "filename": "innosetup-7.1.1-x64.exe",
+    "url": "https://github.com/jrsoftware/issrc/releases/download/is-7_1_1/innosetup-7.1.1-x64.exe",
+    "sha256": "8a5a6711c3766a6e5fb74f280ba0e3551e719ce94538d901fdbd1f8f9920b3f0"
+  },
+  "playwright": {"version": "1.64.1", "chromium_revision": "1248", "chromium_version": "156.0.8078.4"}
+}

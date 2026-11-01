@@ -6,11 +6,13 @@ import sys
 from ragents.storage import TaskStore
 from ragents.task_service import TaskService
 from ragents.worker import Worker, WorkerOptions
+from ragents.profile_paths import database_path
 
 
 def add_worker_parser(commands) -> None:
     parser = commands.add_parser("worker", help="Kalıcı kuyruğu sürekli işle")
-    parser.add_argument("--db", type=Path, default=Path("data/ragents.db"))
+    parser.add_argument("--db", type=Path)
+    parser.add_argument("--root", type=Path)
     parser.add_argument("--concurrency", type=int, default=2)
     parser.add_argument("--poll-seconds", type=float, default=0.5)
     parser.add_argument("--shutdown-seconds", type=float, default=10)
@@ -33,7 +35,7 @@ async def dispatch_worker(args) -> dict:
             previous[signum] = signal.signal(signum, request_stop)
     try:
         print("Worker başlatılıyor; durdurmak için Ctrl+C. Görev içerikleri günlüğe yazılmaz.", file=sys.stderr)
-        await Worker(TaskService(TaskStore(args.db)), options).run(stop=stop, once=args.once)
+        await Worker(TaskService(TaskStore(database_path(getattr(args, "root", None), args.db))), options).run(stop=stop, once=args.once)
     finally:
         for signum, handler in previous.items():
             signal.signal(signum, handler)

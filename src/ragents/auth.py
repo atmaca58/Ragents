@@ -49,7 +49,8 @@ class SystemVault:
 
 
 def auth_root() -> Path:
-    return Path(os.environ.get("RAGENTS_HOME", str(Path.home() / ".ragents"))).resolve()
+    from ragents.profile_paths import profile_root
+    return profile_root()
 
 
 def validate_account(account: str) -> str:
@@ -114,6 +115,8 @@ class ChatGPTStore:
         return Fernet(key.encode("ascii"))
 
     async def save(self, credentials: OpenAIChatGPTCredentials) -> None:
+        if (self.root / "locks/maintenance.flag").exists():
+            raise AuthError("Profil bakım modunda; oturum kaydı güncellemeden sonra yeniden denenmelidir.")
         payload = json.dumps(asdict(credentials)).encode("utf-8")
         encrypted = await asyncio.to_thread(lambda: self.cipher().encrypt(payload))
         atomic_write(self.path, encrypted)

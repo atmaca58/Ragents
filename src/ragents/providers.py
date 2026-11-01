@@ -30,6 +30,9 @@ def resolve_connection(connection: ConnectionSpec) -> tuple[str, str]:
     env_name = connection.api_key_env
     if env_name:
         key = os.environ.get(env_name, "").strip()
+    elif connection.secret_ref:
+        from ragents.secrets import SecretStore
+        key = SecretStore().get(connection.secret_ref) or ""
     if not key:
         raise ValueError(f"API anahtarı eksik: {env_name or 'api_key_env tanımlayın'}")
     return endpoint, key

@@ -3,6 +3,18 @@ class ContextLimitError(RuntimeError):
         super().__init__("Görev bağlam sınırını aşıyor. Görevi küçültün veya bağlam sınırını artırın.")
 
 
+class InstructionError(RuntimeError):
+    """Kullanıcıya gösterilebilir talimat, proje veya skill hatası."""
+
+
+class WorkspaceError(RuntimeError):
+    """Kullanıcıya gösterilebilir workspace, dosya erişimi veya artifact hatası."""
+
+
+class SandboxError(RuntimeError):
+    """Kullanıcıya gösterilebilir sandbox politikası veya yürütme hatası."""
+
+
 class AuthError(RuntimeError):
     """Yalnız güvenli, kullanıcıya gösterilebilir kimlik hataları."""
 

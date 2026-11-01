@@ -2,6 +2,8 @@
 
 Tarih: 1 Kasım 2026. Kapsam: ChatGPT/Luna canlı doğrulama, token/bağlam yönetimi,
 kalıcı görev ve çalışma kayıtları. Arka plan worker ve MCP yürütme servisi sonraki aşamadır.
+Komut örnekleri Windows PowerShell/`.exe` biçimindedir; güncel platform
+karşılıkları [platform desteğindedir](platform-support.md).
 
 ## 1. ChatGPT bağlantısı
 
@@ -19,7 +21,7 @@ Kalıcı canlı kayıt:
   döndürdü. Yeni sağlayıcı çağrısı yapılmadı. Dönen usage önceki çalışmaya aittir.
 
 ```powershell
-cd C:\Projeler\Ajan\Ragents
+cd C:\RAgents-Kaynak
 .\.venv\Scripts\ragents.exe auth status chatgpt
 .\.venv\Scripts\ragents.exe run --config examples/chatgpt-luna.yaml --key benim-denemem "Yalnızca merhaba yaz."
 ```
@@ -138,7 +140,7 @@ makineli dağıtık worker garantisi verilmez.
 # Ardından ayrıca tasks run çalıştırılır.
 
 # Başka veritabanı seçimi (tasks grubunda alt komuttan önce):
-.\.venv\Scripts\ragents.exe tasks --db C:\Projeler\Ajan\Ragents\data\baska.db list
+.\.venv\Scripts\ragents.exe tasks --db C:\RAgents-Kaynak\data\baska.db list
 ```
 
 `--key` aynı ayar/görev/bağlantı içeriğini tekrar eklemez. Aynı anahtarla farklı

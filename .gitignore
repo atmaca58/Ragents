@@ -11,3 +11,8 @@ auth/
 locks/
 ragents.yaml
 local-profile/
+.audit-*/
+.review-*/
+.build-cache/
+.release-stage/
+.installer-tools/

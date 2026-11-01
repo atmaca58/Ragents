@@ -29,9 +29,8 @@ class RemoteTool:
 
 
 def relevant(grant: MCPGrant, prompt: str) -> bool:
-    words = set(re.findall(r"\w+", prompt.casefold()))
-    return grant.always or any(set(re.findall(r"\w+", keyword.casefold())) <= words
-                               for keyword in grant.keywords if keyword.strip())
+    from ragents.relevance import keywords_match
+    return grant.always or keywords_match(grant.keywords, prompt)
 
 
 class ToolCatalog:

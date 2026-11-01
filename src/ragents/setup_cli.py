@@ -7,13 +7,14 @@ from ragents.connections import DEFAULT_KEY_ENVS, ProviderName
 from ragents.diagnostics import inspect_connection
 from ragents.setup_profile import write_profile
 from ragents.storage import TaskStateError
+from ragents.profile_paths import profile_root
 
 
 def add_setup_parser(commands) -> None:
     setup = commands.add_parser("setup", help="Sağlayıcı seç, örnek ajan ve MCP istemci ayarlarını oluştur")
     setup.add_argument("--provider", choices=get_args(ProviderName))
     setup.add_argument("--model")
-    setup.add_argument("--directory", type=Path, default=Path("local-profile"))
+    setup.add_argument("--directory", type=Path)
     setup.add_argument("--agent-id")
     setup.add_argument("--name")
     setup.add_argument("--instructions")
@@ -30,6 +31,7 @@ def add_setup_parser(commands) -> None:
 
 
 async def dispatch_setup(args) -> dict:
+    args.directory = profile_root(args.directory)
     if not args.non_interactive:
         if not sys.stdin.isatty():
             raise TaskStateError("Etkileşimli terminal gerekli; otomasyon için --non-interactive kullanın.")

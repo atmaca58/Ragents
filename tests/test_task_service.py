@@ -14,7 +14,7 @@ def test_execution_persists_result_usage_and_selected_model(tmp_path):
     store = TaskStore(tmp_path / "ragents.db")
     task = store.enqueue(config, "Görev")
 
-    async def runner(config, prompt, connection_id):
+    async def runner(config, prompt, connection_id, workspace):
         assert prompt == "Görev"
         return RunResult(agent_id=config.agent.id, output="Sonuç", usage=Usage(
             requests=1, tool_calls=0, input_tokens=12, output_tokens=3,
@@ -35,7 +35,7 @@ def test_failure_is_recorded_without_raw_exception_or_fabricated_usage(tmp_path)
     store = TaskStore(tmp_path / "ragents.db")
     task = store.enqueue(load_config(Path("examples/chatgpt-luna.yaml")), "Görev")
 
-    async def runner(config, prompt, connection_id):
+    async def runner(config, prompt, connection_id, workspace):
         raise RuntimeError("secret-key-and-provider-prompt")
 
     with pytest.raises(RuntimeError):
@@ -58,7 +58,7 @@ def test_timeout_and_cancellation_leave_terminal_records(tmp_path, error, status
     store = TaskStore(tmp_path / "ragents.db")
     task = store.enqueue(load_config(Path("examples/chatgpt-luna.yaml")), "Görev")
 
-    async def runner(config, prompt, connection_id):
+    async def runner(config, prompt, connection_id, workspace):
         raise error
 
     with pytest.raises(type(error)):
