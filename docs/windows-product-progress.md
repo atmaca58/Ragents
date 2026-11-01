@@ -259,3 +259,33 @@ ve uzak istemci/tünel kabulü yapılmadı.
 Bu paket geliştirme ön sürümüdür; ürün hazır kapısı, gerçek hesap/istemci/
 arama kabulü ve 20 × 3 senaryo tamamlanmış değildir. Canlı ücretli model
 çağrısı yapılmadı. Kendi bilgisayarındaki kabul, temiz VM kabulü diye sunulmaz.
+
+
+## 0.2.0-dev.4 — resmi anahtarsız arama
+
+- Hermes örneği ve sağlayıcıların kendi belgeleri üzerinden Exa, Parallel,
+  Firecrawl ve Keenable resmi ücretsiz MCP uçları doğrulandı. Hermes kodu
+  veya başka uygulamanın kimliği/anahtarı alınmadı; sabit arama araçları
+  mevcut SafeWebClient üzerinden çağrılır.
+- `keyless` seçimi bu dört servis arasında açıkça izin verilmiş bir arama
+  zinciridir. Varsayılan `disabled` korunur. Tek sağlayıcı seçimi değişmez;
+  SearXNG ve diğer mevcut kaynaklarda ek zincir yalnız `--keyless-fallback`
+  ile açılır. Ücretli anahtarlara/hizmetlere geçiş yoktur.
+- `ragents search test`, numaralı kurulum seçimi, kaynak URL/erişim tarihi,
+  gerçek sağlayıcı ve deneme/hata kayıtları eklendi. Bir sağlayıcı en fazla
+  bir kez denenir; geçerli boş sonuç başka sağlayıcıyı tetiklemez.
+- Yerel veri veya model kimliği gönderilmez. Ücretsiz uçlara birincil kaynak
+  anahtarı aktarılmaz. DNS sabitleme, özel ağ/metadata, yanıt boyutu ve süre
+  kontrolleri korunur. Public MCP'nin yalnız sabit arama aracı çağrılır.
+- Canlı, anahtarsız ve araç dışında model kullanmayan kontrol: Exa, Parallel,
+  Keenable ikişer kaynak sonuç döndürdü. Firecrawl açıkça anonim erişimi
+  reddetti; DuckDuckGo CAPTCHA/erişim sınırına takıldı. Bu ikisi deneysel.
+- 38 arama/terminal/web/izin testi ve 12 MCP/motor testi: toplam 50 geçti.
+  Bu sürümde bütün native test seti yeniden koşulmadı; önceki seri yerel
+  taban 306 geçti/3 atlandı. Önceki GitHub Windows Git native testi hâlâ
+  başarısız; bütün CI yeşil veya ürün kabulü tamamlandı denmiyor.
+- Mevcut `read_page` korunur; Trafilatura veya ağ davranışı farklı DDGS
+  bağımlılığı eklenmedi. Ayrıntılar [arama rehberinde](web-search.md).
+
+Kotalar/fiyatlar koda gömülmedi. Sağlayıcıların ücretsiz erişimi, kullanım
+amacı ve koşulları değişebilir. Bu hâlâ ürün kabul kapıları açık bir ön sürüm.

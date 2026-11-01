@@ -33,7 +33,7 @@ ajanın ne yapacağını bağlı yapay zekâ istemcisine anlatırsın.
 Windows 11 x64 üzerinde PowerShell'i aç ve çalıştır:
 
 ```powershell
-irm https://raw.githubusercontent.com/atmaca58/Ragents/v0.2.0-dev.3/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/atmaca58/Ragents/v0.2.0-dev.4/scripts/install.ps1 | iex
 ```
 
 GitHub hesabı, yönetici yetkisi veya önceden kurulmuş Python/Git gerekmez.
@@ -42,7 +42,7 @@ Kurucu gerekli çalışma zamanlarını indirir; internet bağlantısı gerekir.
 Kurulumun sonunda terminal sihirbazı açılır:
 
 1. **Model kaynağını bağla.** Sağlayıcına göre resmi giriş veya API anahtarı kullan.
-2. **Web aramasını seç.** Tavily, Brave, SearXNG veya “şimdilik bağlama”.
+2. **Web aramasını seç.** Ücretsiz anahtarsız arama, Tavily, Brave, SearXNG veya “şimdilik bağlama”.
 3. **Arka plan çalışmasını belirle.** Ajanların oturum açılışında başlatılmasını seç.
 4. **İstemcini bağla.** Aşağıdaki komutlardan kullandığın istemciyi çalıştır.
 
@@ -115,6 +115,24 @@ Doğrudan Anthropic model sağlayıcısı bu sürümde yoktur; Claude MCP istemc
 
 Araçlar açık izinlerle çalışır. Bir özelliğin uygulanmış olması, gerçek
 hesapla ürün kabulünün tamamlandığı anlamına gelmez.
+
+## Ücretsiz ve anahtarsız web araması
+
+Hesap açmadan sınırlı kullanım için:
+
+```powershell
+ragents search configure --provider keyless
+ragents search test "Python resmi belgeleri"
+```
+
+Bu seçim **Exa → Parallel → Firecrawl → Keenable** ücretsiz MCP uçlarını
+hata durumunda sırayla denemeye izin verir. Yanıtta kullanılan sağlayıcı ve
+denemeler görünür. Ücretli hesaba geçilmez; ücretsiz sınırlar garanti edilmez.
+Exa, Parallel ve Keenable ile gerçek anahtarsız arama doğrulandı. Firecrawl
+bu ortamda erişimi reddetti; DuckDuckGo CAPTCHA'ya takıldı ve deneyseldir.
+
+Kendi SearXNG sunucunu veya tek bir sağlayıcıyı da seçebilirsin.
+[Arama seçenekleri ve gizlilik](docs/web-search.md).
 
 ## Günlük komutlar
 

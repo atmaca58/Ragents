@@ -1,5 +1,15 @@
 # Değişiklikler
 
+## 0.2.0-dev.4
+
+- Resmi Exa/Parallel/Firecrawl/Keenable MCP uçlarından anahtarsız arama.
+- Kurulumda açıkça seçilen ücretsiz geçiş zinciri ve SearXNG için isteğe bağlı yedek.
+- Gerçek sağlayıcı, deneme durumu ve hata nedenlerinin sonuçta gösterilmesi.
+- `ragents search test`: model çağırmadan arama bağlantısı denemesi.
+- Deneysel DuckDuckGo HTML adaptörü; CAPTCHA ve bilinmeyen biçimde açık hata.
+- Sabit uç noktaları, mevcut DNS/özel ağ/yanıt sınırları, ücretsiz uçlara anahtar taşımama.
+
+
 ## 0.2.0-dev.3
 
 - Terminalde sağlayıcı ve arama için numaralı seçim menüleri.

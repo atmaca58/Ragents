@@ -10,7 +10,7 @@ Bu geliştirme sürümünün gerçek hesap/istemci ve kurulum kabulü henüz aç
 Herkese açık GitHub geliştirme sürümünü Windows 11 x64 PowerShell'de kurmak:
 
 ```powershell
-irm https://raw.githubusercontent.com/atmaca58/Ragents/v0.2.0-dev.3/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/atmaca58/Ragents/v0.2.0-dev.4/scripts/install.ps1 | iex
 ```
 
 Komut yönetici yetkisi, sistem Python'u, Git veya GitHub hesabı gerektirmez.

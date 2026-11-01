@@ -12,7 +12,7 @@ from ragents.config import AgentSpec, ConnectionSpec, ProjectConfig
 from ragents.connection_catalog import ConnectionCatalog
 from ragents.connections import ProviderName, DEFAULT_KEY_ENVS
 from ragents.profile_paths import profile_root, database_path
-from ragents.search import SearchConnection, save_search_connection, search_connection
+from ragents.search import SearchConnection, SEARCH_PROVIDERS, save_search_connection, search_connection
 from ragents.secrets import SecretStore
 from ragents.setup_plans import SetupPlanService
 from ragents.storage import TaskStore, TaskStateError
@@ -83,8 +83,9 @@ def add_terminal_parsers(commands):
     init.add_argument("--model")
     init.add_argument("--api-key-env")
     init.add_argument("--base-url")
-    init.add_argument("--search", choices=["disabled", "tavily", "brave", "searxng"])
+    init.add_argument("--search", choices=SEARCH_PROVIDERS)
     init.add_argument("--search-endpoint")
+    init.add_argument("--search-keyless-fallback", action="store_true")
     init.add_argument("--login", action=argparse.BooleanOptionalAction, default=None)
     init.add_argument("--background", action=argparse.BooleanOptionalAction, default=None)
     init.add_argument("--non-interactive", action="store_true")
@@ -106,9 +107,12 @@ def add_terminal_parsers(commands):
     search.add_argument("--root", type=Path)
     search_actions = search.add_subparsers(dest="search_action", required=True)
     search_actions.add_parser("status")
+    test_search = search_actions.add_parser("test", help="Seçili sağlayıcıda gerçek arama yap; model çağırmaz")
+    test_search.add_argument("query", nargs="?", default="Python documentation")
     configure = search_actions.add_parser("configure")
-    configure.add_argument("--provider", choices=["disabled", "tavily", "brave", "searxng"], required=True)
+    configure.add_argument("--provider", choices=SEARCH_PROVIDERS, required=True)
     configure.add_argument("--endpoint")
+    configure.add_argument("--keyless-fallback", action="store_true", help="Hata durumunda Exa → Parallel → Firecrawl → Keenable ücretsiz uçlarını denemeye izin ver")
     configure.add_argument("--api-key-env")
     configure.add_argument("--store-key", action="store_true")
     approvals = commands.add_parser("approvals", help="MCP taslaklarını terminalde incele ve yalnız görülen işlemi onayla")
@@ -133,7 +137,7 @@ async def initialize(args):
     if not args.non_interactive:
         print("R Agents · terminal kurulumu\nModel kaynakları: " + ", ".join(get_args(ProviderName)), file=sys.stderr)
         args.provider = args.provider or choose("Model sağlayıcısı", [(name, name) for name in get_args(ProviderName)])
-        args.search = args.search or choose("Web araması", [("disabled", "Şimdilik bağlama"), ("tavily", "Tavily — hesap/anahtar"), ("brave", "Brave — hesap/anahtar"), ("searxng", "SearXNG — instance adresi")])
+        args.search = args.search or choose("Web araması", [("disabled", "Şimdilik bağlama"), ("keyless", "Ücretsiz anahtarsız — Exa → Parallel → Firecrawl → Keenable (hatalarda sırayla dene)"), ("duckduckgo", "DuckDuckGo — ücretsiz, anahtarsız (deneysel; hız/CAPTCHA sınırı)"), ("tavily", "Tavily — hesap/anahtar"), ("brave", "Brave — hesap/anahtar"), ("searxng", "SearXNG — instance adresi")])
     if not args.provider or (args.non_interactive and not args.model):
         raise TaskStateError("Model kaynağı ve model kimliği gereklidir.")
     catalog = ConnectionCatalog(root)
@@ -153,7 +157,7 @@ async def initialize(args):
         args.model = await select_model(candidate, root)
     connection = ConnectionSpec(provider=args.provider, model=args.model, base_url=args.base_url,
                                 api_key_env=env_name, secret_ref=secret_ref)
-    search = SearchConnection(provider=args.search or "disabled",
+    search = SearchConnection(provider=args.search or "disabled", keyless_fallback=args.search_keyless_fallback,
         endpoint=args.search_endpoint or (ask("SearXNG HTTPS instance adresi") if args.search == "searxng" and not args.non_interactive else None))
     if search.provider in ("tavily", "brave") and not args.non_interactive:
         search = search.model_copy(update={"secret_ref": store_key("search-" + search.provider)})
@@ -235,10 +239,15 @@ async def dispatch_terminal(args):
         reference = store_key("model-" + args.id) if args.store_key else None
         return catalog.put(args.id, ConnectionSpec(provider=args.provider, model=args.model, base_url=args.base_url,
             api_key_env=args.api_key_env, secret_ref=reference))
+    if args.search_action == "test":
+        from ragents.search import SearchService
+        return SearchService(search_connection(root)).search(args.query)
     if args.search_action == "status":
         return search_connection(root).model_dump(mode="json")
+    if args.provider in ("keyless", "duckduckgo", "exa_free", "parallel_free", "firecrawl_free", "keenable_free") and (args.store_key or args.api_key_env):
+        raise TaskStateError("Anahtarsız sağlayıcı için anahtar tanımlamayın.")
     reference = store_key("search-" + args.provider) if args.store_key else None
-    connection = SearchConnection(provider=args.provider, endpoint=args.endpoint,
+    connection = SearchConnection(provider=args.provider, endpoint=args.endpoint, keyless_fallback=args.keyless_fallback,
                                   api_key_env=args.api_key_env, secret_ref=reference)
     save_search_connection(root, connection)
     return {"saved": True, "provider": connection.provider, "paid_fallback": False}
