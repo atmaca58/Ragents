@@ -289,3 +289,12 @@ arama kabulü ve 20 × 3 senaryo tamamlanmış değildir. Canlı ücretli model
 
 Kotalar/fiyatlar koda gömülmedi. Sağlayıcıların ücretsiz erişimi, kullanım
 amacı ve koşulları değişebilir. Bu hâlâ ürün kabul kapıları açık bir ön sürüm.
+
+
+## 0.2.0-dev.5 — deneysel arama seçeneklerini kaldırma
+
+Kullanıcı talebiyle DuckDuckGo ve Firecrawl kaynak kodu/sağlayıcı şeması,
+menü ve ücretsiz zincirden çıkarıldı. Zincir yalnız Exa → Parallel → Keenable.
+Geçmiş sürüm kayıtları tarihsel kanıt olarak korunur; güncel ürün rehberi
+kaldırılmış sağlayıcıları seçenek olarak sunmaz. Eski profilde kaldırılmış
+bir kaynak seçilmişse `ragents search configure --provider keyless` ile değiştirilir.

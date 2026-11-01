@@ -33,7 +33,7 @@ ajanın ne yapacağını bağlı yapay zekâ istemcisine anlatırsın.
 Windows 11 x64 üzerinde PowerShell'i aç ve çalıştır:
 
 ```powershell
-irm https://raw.githubusercontent.com/atmaca58/Ragents/v0.2.0-dev.4/scripts/install.ps1 | iex
+irm https://raw.githubusercontent.com/atmaca58/Ragents/v0.2.0-dev.5/scripts/install.ps1 | iex
 ```
 
 GitHub hesabı, yönetici yetkisi veya önceden kurulmuş Python/Git gerekmez.
@@ -125,11 +125,10 @@ ragents search configure --provider keyless
 ragents search test "Python resmi belgeleri"
 ```
 
-Bu seçim **Exa → Parallel → Firecrawl → Keenable** ücretsiz MCP uçlarını
+Bu seçim **Exa → Parallel → Keenable** ücretsiz MCP uçlarını
 hata durumunda sırayla denemeye izin verir. Yanıtta kullanılan sağlayıcı ve
 denemeler görünür. Ücretli hesaba geçilmez; ücretsiz sınırlar garanti edilmez.
-Exa, Parallel ve Keenable ile gerçek anahtarsız arama doğrulandı. Firecrawl
-bu ortamda erişimi reddetti; DuckDuckGo CAPTCHA'ya takıldı ve deneyseldir.
+Exa, Parallel ve Keenable ile gerçek anahtarsız arama doğrulandı.
 
 Kendi SearXNG sunucunu veya tek bir sağlayıcıyı da seçebilirsin.
 [Arama seçenekleri ve gizlilik](docs/web-search.md).

@@ -15,7 +15,7 @@ from ragents.secrets import SecretStore
 from ragents.search_keyless import KEYLESS_PROVIDERS, keyless_search
 
 
-SearchProvider = Literal["disabled", "duckduckgo", "tavily", "brave", "searxng", "keyless", "exa_free", "parallel_free", "firecrawl_free", "keenable_free"]
+SearchProvider = Literal["disabled", "tavily", "brave", "searxng", "keyless", "exa_free", "parallel_free", "keenable_free"]
 SEARCH_PROVIDERS = get_args(SearchProvider)
 
 
@@ -29,7 +29,7 @@ class SearchConnection(Spec):
 
     @model_validator(mode="after")
     def validate_provider(self):
-        if self.provider in ("duckduckgo", "keyless", *KEYLESS_PROVIDERS) and (self.api_key_env or self.secret_ref):
+        if self.provider in ("keyless", *KEYLESS_PROVIDERS) and (self.api_key_env or self.secret_ref):
             raise ValueError("Seçilen sağlayıcı anahtarsızdır; anahtar kaynağı tanımlamayın.")
         if self.keyless_fallback and self.provider in ("disabled", "keyless", *KEYLESS_PROVIDERS):
             raise ValueError("Bu sağlayıcı için ek anahtarsız yedek seçimi geçersiz.")
@@ -94,9 +94,6 @@ class SearchService:
             raise WebAccessError("Arama sağlayıcısının API anahtarı eksik.")
         if connection.provider in KEYLESS_PROVIDERS:
             items = keyless_search(self.client, connection.provider, query, count)
-        elif connection.provider == "duckduckgo":
-            from ragents.search_duckduckgo import search_duckduckgo
-            items = search_duckduckgo(self.client, query, count)
         elif connection.provider == "tavily":
             payload = self.client.json_request("https://api.tavily.com/search", method="POST",
                 headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
@@ -128,4 +125,4 @@ class SearchService:
                 "content": str(item.get("content", item.get("description", "")))[:2000],
                 "published_at": item.get("published_date", item.get("age")), "retrieved_at": retrieved})
         return {"provider": connection.provider, "results": results, "untrusted_content": True,
-                "experimental": connection.provider in ("duckduckgo", "firecrawl_free")}
+                "experimental": False}

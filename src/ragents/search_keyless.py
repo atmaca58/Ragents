@@ -6,11 +6,10 @@ import uuid
 from ragents.web_tools import WebAccessError
 
 
-KEYLESS_PROVIDERS = ('exa_free', 'parallel_free', 'firecrawl_free', 'keenable_free')
+KEYLESS_PROVIDERS = ('exa_free', 'parallel_free', 'keenable_free')
 ENDPOINTS = {
     'exa_free': ('https://mcp.exa.ai/mcp', 'web_search_exa'),
     'parallel_free': ('https://search.parallel.ai/mcp', 'web_search'),
-    'firecrawl_free': ('https://mcp.firecrawl.dev/v2/mcp', 'firecrawl_search'),
     'keenable_free': ('https://api.keenable.ai/mcp-public', 'search_web_pages'),
 }
 _SESSION = uuid.uuid4().hex
@@ -76,7 +75,6 @@ def keyless_search(client, provider, query, count):
     arguments = {
         'exa_free': {'query': query, 'numResults': count},
         'parallel_free': {'objective': query, 'search_queries': [query], 'session_id': _SESSION},
-        'firecrawl_free': {'query': query, 'limit': count, 'objective': query, 'sources': [{'type': 'web'}]},
         'keenable_free': {'query': query, 'max_results': count, 'output_format': 'json'},
     }[provider]
     payload = {'jsonrpc': '2.0', 'id': 1, 'method': 'tools/call', 'params': {'name': tool, 'arguments': arguments}}

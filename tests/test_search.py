@@ -15,59 +15,20 @@ def test_search_quota_error_does_not_fall_back(monkeypatch):
     with pytest.raises(WebAccessError, match="kotası"):
         service.search("araştır")
     assert calls == ["https://api.tavily.com/search"]
-from types import SimpleNamespace
-
 from pydantic import ValidationError
-from ragents.web_tools import SafeWebClient, WebResponse
-
-
-def ddg_service(html, *, status=200):
-    calls = []
-    def transport(url, address, method, headers, body):
-        calls.append((url, headers))
-        return WebResponse(status, {'content-type': 'text/html; charset=UTF-8'}, html.encode())
-    client = SafeWebClient(resolver=lambda *_: ['8.8.8.8'], transport=transport)
-    return SearchService(SearchConnection(provider='duckduckgo'), client=client), calls
-
-
-def test_keyless_search_normalizes_results_without_credentials():
-    service, calls = ddg_service('''<a class="result__a" href="//duckduckgo.com/l/?uddg=https%3A%2F%2Fexample.org%2Fdocs">Python <b>docs</b></a>
-        <a class="result__snippet">A &amp; B</a>
-        <a class="result__a" href="javascript:alert(1)">Bad</a>''')
-    result = service.search('Türkçe & Python')
-    assert len(calls) == 1 and calls[0][1] == {}
-    assert '%26' in calls[0][0]
-    assert result['experimental'] and result['untrusted_content']
-    assert len(result['results']) == 1
-    item = result['results'][0]
-    assert item['url'] == 'https://example.org/docs'
-    assert item['title'] == 'Python docs' and item['content'] == 'A & B'
-    assert item['retrieved_at'] and item['published_at'] is None
-
-
-@pytest.mark.parametrize('html,status', [('<form id="challenge-form"></form>', 200), ('blocked', 202), ('unexpected layout', 200)])
-def test_keyless_block_or_changed_format_fails_without_fallback(html, status):
-    service, calls = ddg_service(html, status=status)
-    with pytest.raises(WebAccessError):
-        service.search('Python')
-    assert len(calls) == 1
-
-
-def test_keyless_real_empty_results_are_not_format_failure():
-    service, _ = ddg_service('<div class="no-results">No results</div>')
-    assert service.search('unknown query')['results'] == []
+from ragents.web_tools import WebResponse
 
 
 def test_keyless_provider_rejects_credentials():
     with pytest.raises(ValidationError):
-        SearchConnection(provider='duckduckgo', secret_ref='not-for-ddg')
+        SearchConnection(provider='exa_free', secret_ref='not-for-keyless')
 
 
 def test_keyless_search_configuration_needs_no_secret(tmp_path, capsys):
     from ragents.cli import main
     from ragents.search import search_connection
-    assert main(['search', '--root', str(tmp_path), 'configure', '--provider', 'duckduckgo']) == 0
-    assert search_connection(tmp_path).provider == 'duckduckgo'
+    assert main(['search', '--root', str(tmp_path), 'configure', '--provider', 'exa_free']) == 0
+    assert search_connection(tmp_path).provider == 'exa_free'
     assert search_connection(tmp_path).secret_ref is None
 
 
@@ -153,3 +114,9 @@ def test_all_free_providers_failing_is_bounded():
     with pytest.raises(WebAccessError, match='Ücretli servise geçilmedi'):
         SearchService(SearchConnection(provider='keyless'), client=Client()).search('Python')
     assert len(calls) == len(KEYLESS_PROVIDERS)
+
+
+@pytest.mark.parametrize("provider", ["duckduckgo", "firecrawl_free"])
+def test_removed_experimental_providers_cannot_be_configured(provider):
+    with pytest.raises(ValidationError):
+        SearchConnection(provider=provider)

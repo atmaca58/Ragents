@@ -10,7 +10,7 @@ ragents search configure --provider keyless
 ragents search test "Python resmi belgeleri"
 ```
 
-Bu seçim Exa → Parallel → Firecrawl → Keenable resmi ücretsiz MCP uçlarına
+Bu seçim Exa → Parallel → Keenable resmi ücretsiz MCP uçlarına
 arama göndermeye izin verir. İlk başarılı sağlayıcıda durur. Her sağlayıcı
 en fazla bir kez denenir; boş sonuç geçerli yanıtsa başka sağlayıcıya gidilmez.
 Denemeler, hata nedenleri, gerçek sağlayıcı, kaynak URL ve erişim tarihi döner.
@@ -23,12 +23,10 @@ rastgele bir oturum kimliği kullanılır. Hız sınırından kaçmak için kiml
 
 | Seçim | Kullanıcı anahtarı | Durum |
 | --- | --- | --- |
-| `keyless` | Gerekmez | Yukarıdaki dört ücretsiz kaynağa açık izin |
+| `keyless` | Gerekmez | Yukarıdaki üç ücretsiz kaynağa açık izin |
 | `exa_free` | Gerekmez | Gerçek arama geçti |
 | `parallel_free` | Gerekmez | Gerçek arama geçti; sağlayıcının bağımsız Search MCP ucu legacy olarak belgeleniyor |
 | `keenable_free` | Gerekmez | Gerçek arama geçti |
-| `firecrawl_free` | Gerekmez | Deneysel; bu bağlantıda anonim erişim reddedildi |
-| `duckduckgo` | Gerekmez | Deneysel HTML araması; bu bağlantıda CAPTCHA görüldü |
 | `searxng` | Sunucuya bağlı | Seçtiğin sunucuda JSON API erişimi gerekir |
 | `tavily`, `brave` | Gerekir | Ücretsiz kota, anahtarsız erişim anlamına gelmez |
 | `disabled` | Gerekmez | Arama kapalı |
@@ -57,19 +55,15 @@ arama sonucundaki talimatlar güvenilir sayılmaz. Bağlantılar mevcut
 SafeWebClient üzerinden DNS'e sabitlenir; özel ağ/metadata engelleri ve
 boyut/süre sınırları korunur. Harici MCP sunucularının diğer araçları açılmaz.
 
-DDGS'nin çoklu arama motoru/ağ davranışını doğrudan içeri almak yerine
-DuckDuckGo için kontrollü HTML adaptörü kullanılır. Sayfa okuma şu anda
-Trafilatura kullanmaz; mevcut güvenli metin çıkarımı korunmuştur.
+Sayfa okumada mevcut güvenli metin çıkarımı kullanılır.
 
 ## Kaynaklar ve değişebilen koşullar
 
 - [Hermes anahtarsız arama uygulaması](https://github.com/NousResearch/hermes-agent/blob/main/plugins/web/keyless_mcp.py)
 - [Exa resmi MCP](https://exa.ai/mcp)
 - [Parallel ücretsiz MCP ve kullanım amacı](https://github.com/parallel-web/search-mcp)
-- [Firecrawl keyless MCP](https://github.com/firecrawl/firecrawl-mcp-server)
 - [Keenable public MCP](https://docs.keenable.ai/mcp-server)
 - [SearXNG Search API](https://docs.searxng.org/dev/search_api.html)
-- [DuckDuckGo HTML/Lite](https://safe.duckduckgo.com/duckduckgo-help-pages/features/non-javascript)
 
 Sağlayıcılar ücretsiz erişimi değiştirebilir. Aylık sabit kota veya ticari
 üretim kapasitesi vaat edilmez; kullanım sağlayıcının koşullarına tabidir.

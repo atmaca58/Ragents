@@ -10,6 +10,11 @@ depoyu herkese açık yapmayı ve tek komutluk geliştirme kurulumu yayımlamay�
 açıkça istedi. Bu yayını kabul edilmiş/bitmiş ürün diye sunmayın; kişisel
 ajan geçişi hâlâ son adımdır.
 
+Arama sağlayıcılarında kullanıcı tercihi: yeni bir kaynak ancak gerçek
+anahtarsız/ilgili bağlantı ve arama kontrolü geçtiyse ürün menüsü ve otomatik
+zincire eklenir. Başarısız veya deneysel adaptörleri yayın paketine almayın;
+kullanıcıya çalışmayan seçenek göstermeyin.
+
 Ana ürün arayüzü terminaldir (`terminal_setup.py`, `client_connections.py`).
 Yeni ürün web paneli eklemeyin. MCP taslağı yerel etkileşimli terminalde,
 görülen işlem hash'iyle onaylanır; MCP veya pipe insan onayı üretemez.

@@ -1,5 +1,11 @@
 # Değişiklikler
 
+## 0.2.0-dev.5
+
+- Çalışmayan deneysel DuckDuckGo ve Firecrawl adaptörleri, menü ve ayarlardan kaldırıldı.
+- Ücretsiz zincir yalnız gerçek arama kontrolü geçen Exa → Parallel → Keenable oldu.
+- Kullanım belgeleri sadeleştirildi.
+
 ## 0.2.0-dev.4
 
 - Resmi Exa/Parallel/Firecrawl/Keenable MCP uçlarından anahtarsız arama.
